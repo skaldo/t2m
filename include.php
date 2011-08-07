@@ -49,7 +49,7 @@ define("MORSE_N_8", "----.");
 define("MORSE_N_9", "-----");
 define("MORSE_S_QUESTIONMARK", "..--..");   // ?
 define("MORSE_S_COMMA", "--..--");          // ,
-define("MORSE_S_EXCLAMATIONMARK", "--...-"); // !
+define("MORSE_S_EXCLAMATIONMARK", "--...-");// !
 define("MORSE_S_DOT", ".-.-.-");            // .
 define("MORSE_S_SEMICOLON", "-.-.-.");      // ;
 define("MORSE_S_SLASH", "-..-.");           // /
@@ -64,11 +64,13 @@ define("MORSE_S_UNDERSCORE", "..--.-");     // _
 define("MORSE_S_ATSIGN", ".--.-.");         // @
 //DEFINE ERRORS
 //error texts
+define("ERROR_FATAL", "Chyba:", true);
+define("ERROR_WARNING", "Upozornění:", true);
 define("ERROR_T2M", "Vstup je pro morseovu abecedu neplatný.", true);
 define("ERROR_M2T", "Vstup je neplatný. Morseova abeceda pracuje pouze se znaky <b>/</b> ,<b>-</b> a <b>.</b>", true);
 define("ERROR_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno, bude zobrazeno mezi hvězdičkami.", true);
-define("ERROR_TIP_LIST", "<br /><span class=\"tip\"><b>Tip:</b> Máte problémy s Morseovou abecedou? Podívejte se na <a href=\"help.html\" onclick=\"return popup('help.html')\">seznam znaků</a>!</span>", true);
 define("ERROR_EMPTY_INPUT", "Nezapomněli jste na něco?", true);
+define("ERROR_TIP_LIST", "<br /><span class=\"tip\"><b>Tip:</b> Máte problémy s Morseovou abecedou? Podívejte se na <a href=\"help.html\" onclick=\"return popup('help.html')\">seznam znaků</a>!</span>", true);
 
 function diacriticFree($text) {
     $array = Array('ä' => 'a', 'Ä' => 'A', 'á' => 'a', 'Á' => 'A', 'à' => 'a', 'À' => 'A', 'ã' => 'a', 'Ã' => 'A', 'â' => 'a', 'Â' => 'A', 'č' => 'c', 'Č' => 'C', 'ć' => 'c', 'Ć' => 'C', 'ď' => 'd', 'Ď' => 'D', 'ě' => 'e', 'Ě' => 'E', 'é' => 'e', 'É' => 'E', 'ë' => 'e', 'Ë' => 'E', 'è' => 'e', 'È' => 'E', 'ê' => 'e', 'Ê' => 'E', 'í' => 'i', 'Í' => 'I', 'ï' => 'i', 'Ï' => 'I', 'ì' => 'i', 'Ì' => 'I', 'î' => 'i', 'Î' => 'I', 'ľ' => 'l', 'Ľ' => 'L', 'ĺ' => 'l', 'Ĺ' => 'L', 'ń' => 'n', 'Ń' => 'N', 'ň' => 'n', 'Ň' => 'N', 'ñ' => 'n', 'Ñ' => 'N', 'ó' => 'o', 'Ó' => 'O', 'ö' => 'o', 'Ö' => 'O', 'ô' => 'o', 'Ô' => 'O', 'ò' => 'o', 'Ò' => 'O', 'õ' => 'o', 'Õ' => 'O', 'ő' => 'o', 'Ő' => 'O', 'ř' => 'r', 'Ř' => 'R', 'ŕ' => 'r', 'Ŕ' => 'R', 'š' => 's', 'Š' => 'S', 'ś' => 's', 'Ś' => 'S', 'ť' => 't', 'Ť' => 'T', 'ú' => 'u', 'Ú' => 'U', 'ů' => 'u', 'Ů' => 'U', 'ü' => 'u', 'Ü' => 'U', 'ù' => 'u', 'Ù' => 'U', 'ũ' => 'u', 'Ũ' => 'U', 'û' => 'u', 'Û' => 'U', 'ý' => 'y', 'Ý' => 'Y', 'ž' => 'z', 'Ž' => 'Z', 'ź' => 'z', 'Ź' => 'Z');
@@ -76,16 +78,18 @@ function diacriticFree($text) {
     return $temp;
 }
 
-$error = "";
+$error = NULL;
 $error_fatal = FALSE;
 
 function doError($text, $fatal) {
     global $error;
     global $error_fatal;
-    if ($fatal === false) {
-        $error .= "<span class=\"error warning\">Upozornění: </span>" . $text . "<br />";
+    if ($fatal === FALSE) {
+        $error .= "<span class=\"error warning\">" . ERROR_WARNING . " </span>".$text."<br />";
+    } elseif (($fatal !== FALSE) && ($error_fatal == TRUE)) {
+        // in case we already have one fatal error _DO_NOTHING_ to avoid stacking errors
     } else {
-        $error .="<span class=\"error fatal\">Chyba: </span>" . $text . "<br />";
+        $error .="<span class=\"error fatal\">" . ERROR_FATAL . " </span>".$text."<br />";
         $error_fatal = TRUE;
     }
 }
@@ -96,7 +100,6 @@ function showError() {
 }
 
 function t2m($text) {
-    $text = trim($text);
     $text = diacriticFree($text);
 
     if (!preg_match('!^[a-zA-Z0-9\?\,\!\.\;\/\=\-\(\)\"\:\_\@\ \n\r]+$!', $text)) {
@@ -247,8 +250,7 @@ function t2m($text) {
 }
 
 function m2t($text) {
-    $text = trim($text);
-    //strip all whitespaces
+    //strip _all_ whitespaces
     $text = str_replace(" ", "", $text);
 
     // change input from custom to default dot/dash/slash
@@ -392,16 +394,12 @@ function m2t($text) {
 }
 
 function showOutput($text) {
-    /*
-     * We will not use this until better error handling comes. This check is already at index.php
-     * if ($text == NULL)
-     *  doError(ERROR_EMPTY_INPUT, true);
-     */
-
     $text = trim($text);
+    if ($text == NULL)
+        doError(ERROR_EMPTY_INPUT, true);
 
     //if something goes wrong, just make an error during t2m/m2t
-    //check for the only chars available in MorseCode
+    //check for the only chars available in MorseCode (.-/)
     if (preg_match('/^[\ \-\.\/]+$/i', $text)) {
         $return = m2t($text);
     } else {

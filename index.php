@@ -6,7 +6,10 @@
  *       - move "chyba" and "upozorneni" into defines for easier change.
  * H: Determine what to do with custom output or try to make it work.
  * H: Max $_POST length?
- * L: Add SEO?
+ * 
+ * M: Better UI
+ * 
+ * L: SEO optimize? - discussion: be a script or web page/script
  * 
  * F: oddělovač vět?
  * F: Add more encode/decode
@@ -56,20 +59,15 @@ if (isset($_POST['input']))
                 if ($ok == 1) {
                     //do this before errors, we want to have errors on top without using CSS position:abs/rel
                     //put output into $output, echo later
-                    
-                    //when better error handling comes, delete (commented in showOutput)
-                    if ($input == NULL)
-                        doError(ERROR_EMPTY_INPUT, true);
-                    if ($input != NULL)
-                        $output = showOutput($input);
+                    $output = showOutput($input);
 
                     //is there an error?
-                    if (showError() != "") {
+                    if (showError() != NULL) {
                         echo "<div id=\"error\">" . showError() . "</div>";
                     }
 
                     //echo output here
-                    if (isset($output) && ($error_fatal != TRUE))
+                    if ($error_fatal != TRUE)
                         echo "<div id=\"output\">" . $output . "</div>";
                 }
                 ?>
@@ -80,7 +78,7 @@ if (isset($_POST['input']))
     <div id="info_bubble">
         Dekódování morseovky
         <ul type="circle">
-            <li>Písmena se oddělují lomítkem<b>/</b> , mezeru zastupují lomítka dvě <b>//</b></li>
+            <li>Písmena se oddělují lomítkem <b>/</b> , mezeru zastupují lomítka dvě <b>//</b></li>
         </ul>
         <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
     </div>
