@@ -2,8 +2,6 @@
 <?php
 /*
  * TODO:
- * H: Better error handling! if one fatal, dont make another, just end quietly.
- *       - move "chyba" and "upozorneni" into defines for easier change.
  * H: Determine what to do with custom output or try to make it work.
  * H: Max $_POST length?
  * 
@@ -62,25 +60,28 @@ if (isset($_POST['input']))
                     $output = showOutput($input);
 
                     //is there an error?
-                    if (showError() != NULL) {
-                        echo "<div id=\"error\">" . showError() . "</div>";
+                    if (showError(2) != NULL) {
+                        echo showError(2);
                     }
 
+                    //is there an tip?
+                    if (showError(0) != NULL){
+                        echo showError(0);
+                    }
                     //echo output here
-                    if ($error_fatal != TRUE)
+                    if ($isFatalError != TRUE)
                         echo "<div id=\"output\">" . $output . "</div>";
                 }
                 ?>
             </div>
         </div>
-    </div>
-    <div class="cleaner"></div>
-    <div id="info_bubble">
-        Dekódování morseovky
-        <ul type="circle">
-            <li>Písmena se oddělují lomítkem <b>/</b> , mezeru zastupují lomítka dvě <b>//</b></li>
-        </ul>
-        <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
-    </div>
-</body>
+        <div class="cleaner"></div>
+        <div id="info_bubble">
+            Dekódování morseovky
+            <ul type="circle">
+                <li>Písmena se oddělují lomítkem <b>/</b> , mezeru zastupují lomítka dvě <b>//</b></li>
+            </ul>
+            <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
+        </div>
+    </body>
 </html>
