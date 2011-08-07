@@ -6,14 +6,6 @@ $isFatalError = FALSE;
 $errorOutput = NULL;
 $tipOutput = NULL;
 
-/*
-  //DEFINE OUTPUT
-  //output for t2m. Put here whatever char you like, just don't make dot appear like dash :)
-  define("OUTPUT_DOT", "&#149;", true);
-  define("OUTPUT_DASH", "&#151;", true);
-  define("OUTPUT_SLASH", "/", true);
- */
-
 //DEFINE ERRORS
 define("ERROR_FATAL", "Chyba:", true);
 define("ERROR_WARNING", "Upozornění:", true);
@@ -241,25 +233,12 @@ function t2m($text) {
         $return.= "<strong>" . $arr . "</strong> / ";
     }
 
-    /*
-      // change output from default dot/dash/slash
-      $return = str_replace(".", OUTPUT_DOT, $return);
-      $return = str_replace("-", OUTPUT_DASH, $return);
-      $return = str_replace("/", OUTPUT_SLASH, $return);
-     */
     return $return;
 }
 
 function m2t($text) {
     //strip _all_ whitespaces
     $text = str_replace(" ", "", $text);
-
-    // change input from custom to default dot/dash/slash
-    /*
-      $text = str_replace(chr(149), ".", $text);
-      $text = str_replace(OUTPUT_DASH, "-", $text);
-      $text = str_replace(OUTPUT_SLASH, "/", $text);
-     */
 
     if (preg_match('!^[^\.\/\-]+$!', $text) == 1) {
         doError(ERROR_MORSE_M2T_INPUT, 2);
