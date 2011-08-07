@@ -1,0 +1,71 @@
+body {
+    text-align: center; /* centrovani pro IE quirk */
+    font-family: arial, sans-serif;
+}
+
+#wrapper{
+    margin: auto;  /* centrovani standardní prohlížeče */
+    text-align: left; /* ukonceni centrovani */
+}
+#left{
+    width:350px;
+    padding-right: 20px;
+    float:left;
+    border-right: 1px solid black;
+}
+
+#right{
+    margin: 1em 0 0 2em;
+    padding: 1em;
+    float:left;
+    max-width: 650px;
+}
+
+#error{
+    text-align:left;
+    border: 1px solid red;
+    background: url("warning.png") no-repeat right center #FFF9D7;
+    padding: .5em 5em .5em .5em;
+    margin: 1em 0 2em 0;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+#output{
+    overflow: auto;
+    max-height: 50%;
+    letter-spacing: .1em;
+}
+
+#info_bubble{
+    text-align:left;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    border: 1.5px solid black;
+    margin-top: 70px;
+    margin-left: 10%;
+    padding: .5em;
+    width:45%;
+    -webkit-box-shadow: 10px 10px 10px 0px gray;
+    -moz-box-shadow: 10px 10px 10px 0px gray;
+    box-shadow: 10px 10px 10px 0px gray;
+}
+
+.form {
+    font-size:.8em;
+}
+.error{font-weight:bold;}
+.fatal{}
+.warning{}
+.tip {font-size:.8em;}
+.morse_error{color:red;}
+
+.cleaner {
+    clear:both;
+    height:1px;
+    margin: -1px 0 0 0; padding:0;
+    border:none;
+    visibility: hidden;
+}
