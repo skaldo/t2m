@@ -1,57 +1,58 @@
 <?php
 //DEFINE MORSECODE
-define("MORSE_A", ".-", true);      //Akát
-define("MORSE_B", "-...", true);    //Blýskavice
-define("MORSE_C", "-.-.", true);    //Cílovníci
-define("MORSE_D", "-..", true);     //Dálava
-define("MORSE_E", ".", true);       //Erb
-define("MORSE_F", "..-.", true);    //Filipíny
-define("MORSE_G", "--.", true);     //Grónskázem
-define("MORSE_H", "....", true);    //Hrachovina
-define("MORSE_CH", "----", true);   //Chvátámkvámsám
-define("MORSE_I", "..", true);      //Ibis
-define("MORSE_J", ".---", true);    //Jasmínbílý
-define("MORSE_K", "-.-", true);     //Krákorá
-define("MORSE_L", ".-..", true);    //Lupíneček
-define("MORSE_M", "--", true);      //Mává
-define("MORSE_N", "-.", true);      //Nástup
-define("MORSE_O", "---", true);     //Ónášpán
-define("MORSE_P", ".--.", true);    //Papírníci
-define("MORSE_Q", "--.-", true);    //Kvílíorkán
-define("MORSE_R", ".-.", true);     //Rarášek
-define("MORSE_S", "...", true);     //Sobota
-define("MORSE_T", "-", true);       //Tón
-define("MORSE_U", "..-", true);     //Uličník
-define("MORSE_V", "...-", true);    //Vyučený
-define("MORSE_W", ".--", true);     //Wagónklád
-define("MORSE_X", "-..-", true);    //Xénokratés
-define("MORSE_Y", "-.--", true);    //Ýgarmává
-define("MORSE_Z", "--..", true);    //Známážena
-define("MORSE_SPACE", "/", true);
-define("MORSE_N_0", ".----");
-define("MORSE_N_1", "..---");
-define("MORSE_N_2", "...--");
-define("MORSE_N_3", "....-");
-define("MORSE_N_4", ".....");
-define("MORSE_N_5", "-....");
-define("MORSE_N_6", "--...");
-define("MORSE_N_7", "---..");
-define("MORSE_N_8", "----.");
-define("MORSE_N_9", "-----");
-define("MORSE_S_QUESTIONMARK", "..--..");   // ?
-define("MORSE_S_COMMA", "--..--");          // ,
-define("MORSE_S_EXCLAMATIONMARK", "--...-"); // !
-define("MORSE_S_DOT", ".-.-.-");            // .
-define("MORSE_S_SEMICOLON", "-.-.-.");      // ;
-define("MORSE_S_SLASH", "-..-.");           // /
-define("MORSE_S_EQUAL", "-...-");           // =
-define("MORSE_S_DASH", "-....-");           // -
-define("MORSE_S_TAB", ".----.");            // \t
-define("MORSE_S_BRACKETOPEN", "-.--.");     // (
-define("MORSE_S_BRACKETCLOSE", "-.--.-");   // )
-define("MORSE_S_QUOTATIONMARK", ".-..-.");  // "
-define("MORSE_S_COLON", "---...");          // :
-define("MORSE_S_UNDERSCORE", "..--.-");     // _
-define("MORSE_S_ATSIGN", ".--.-.");         // @
-
+$morse = array(
+    "a" => array("A", ".-"),
+    "b" => array("B", "-..."),
+    "c" => array("C", "-.-."),
+    "d" => array("D", "-.."), 
+    "e" => array("E", "."),
+    "f" => array("F", "..-."),
+    "g" => array("G", "--."),
+    "h" => array("H", "...."),
+    "ch" => array("CH", "----"),
+    "i" => array("I", ".."),    
+    "j" => array("J", ".---"),
+    "k" => array("K", "-.-"),
+    "l" => array("L", ".-.."),
+    "m" => array("M", "--"),
+    "n" => array("N", "-."),
+    "o" => array("O", "---"),
+    "p" => array("P", ".--."),
+    "q" => array("Q", "--.-"),
+    "r" => array("R", ".-."),
+    "s" => array("S", "..."),
+    "t" => array("T", "-"),
+    "u" => array("U", "..-"),
+    "v" => array("V", "...-"),
+    "w" => array("W", ".--"),
+    "x" => array("X", "-..-"),
+    "y" => array("Y", "-.--"),
+    "z" => array("Z", "--.."),
+    " " => array(" ", "/"),
+    "0" => array("0", ".----"),
+    "1" => array("1", "..---"),
+    "2" => array("2", "...--"),
+    "3" => array("3", "....-"),
+    "4" => array("4", "....."),
+    "5" => array("5", "-...."),
+    "6" => array("6", "--..."),
+    "7" => array("7", "---.."),
+    "8" => array("8", "----."),
+    "9" => array("9", "-----"),
+    "?" => array("?", "..--.."),
+    "," => array(",", "--..--"),
+    "!" => array("!", "--...-"),
+    "." => array(".", ".-.-.-"),
+    ";" => array(";", "-.-.-."),
+    "/" => array("/", "-..-."),
+    "=" => array("=", "-...-"),
+    "-" => array("-", "-....-"),
+    "\t" => array("\t", ".----."),
+    "(" => array("(", "-.--."),
+    ")" => array(")", "-.--.-"),
+    "\"" => array("?", ".-..-."),
+    ":" => array(":", "---..."),
+    "_" => array("_", "..--.-"),
+    "@" => array("@", ".--.-."),
+);
 ?>

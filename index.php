@@ -1,8 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <?php
+$mtime = microtime();
+$mtime = explode(" ", $mtime);
+$mtime = $mtime[1] + $mtime[0];
+$starttime = $mtime;
+
 /*
  * TODO:
- * H: Determine what to do with custom output or try to make it work.
  * H: Max $_POST length?
  * 
  * M: Better UI
@@ -65,9 +69,10 @@ if (isset($_POST['input']))
                     }
 
                     //is there an tip?
-                    if (showError(0) != NULL){
+                    if (showError(0) != NULL) {
                         echo showError(0);
                     }
+
                     //echo output here
                     if ($isFatalError != TRUE)
                         echo "<div id=\"output\">" . $output . "</div>";
@@ -80,8 +85,20 @@ if (isset($_POST['input']))
             Dekódování morseovky
             <ul type="circle">
                 <li>Písmena se oddělují lomítkem <b>/</b> , mezeru zastupují lomítka dvě <b>//</b></li>
+                <li>---</li>
+                <li>TODO: - Pokud ve vstupu pouze cisla, pouzivat specialni zkratky pro morseovku?</li>
             </ul>
+            
             <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
         </div>
     </body>
 </html>
+<?php
+$mtime = microtime();
+$mtime = explode(" ", $mtime);
+$mtime = $mtime[1] + $mtime[0];
+$endtime = $mtime;
+$totaltime = ($endtime - $starttime) * 1000;
+//Uncoment this for execution time:
+//echo "This page was created in " . $totaltime . " ms";
+?>
