@@ -74,7 +74,7 @@ if (isset($_POST['input']))
                     }
 
                     //echo output here
-                    if ($isFatalError != TRUE)
+                    if (isError(2)!=TRUE)
                         echo "<div id=\"output\">" . $output . "</div>";
                 }
                 ?>
@@ -88,7 +88,6 @@ if (isset($_POST['input']))
                 <li>---</li>
                 <li>TODO: - Pokud ve vstupu pouze cisla, pouzivat specialni zkratky pro morseovku?</li>
             </ul>
-            
             <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
         </div>
     </body>

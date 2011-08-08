@@ -1,16 +1,17 @@
 <?php
+
 //DEFINE MORSECODE
 $morse = array(
     "a" => array("A", ".-"),
     "b" => array("B", "-..."),
     "c" => array("C", "-.-."),
-    "d" => array("D", "-.."), 
+    "d" => array("D", "-.."),
     "e" => array("E", "."),
     "f" => array("F", "..-."),
     "g" => array("G", "--."),
     "h" => array("H", "...."),
     "ch" => array("CH", "----"),
-    "i" => array("I", ".."),    
+    "i" => array("I", ".."),
     "j" => array("J", ".---"),
     "k" => array("K", "-.-"),
     "l" => array("L", ".-.."),
@@ -55,4 +56,9 @@ $morse = array(
     "_" => array("_", "..--.-"),
     "@" => array("@", ".--.-."),
 );
+
+$morse_buffer = array();
+foreach ($morse as $temp) {
+        array_push($morse_buffer,$temp[1]);
+}
 ?>

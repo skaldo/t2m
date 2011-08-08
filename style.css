@@ -75,7 +75,7 @@ ul{
 .tip{font-weight:bold;}
 .fatal{}
 .warning{}
-    .morse_error{color:red;}
+.red{color:red;}
 
 .cleaner {
     clear:both;
