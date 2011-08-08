@@ -172,15 +172,20 @@ function morseCode($text, $encode) {
 
         //MORSECODE DECODE
         //strip _all_ whitespaces
-        $text = str_replace(" ", "", $text);
-
-        //preg_match is already handled in showOutput(), so this shoul never happen
-        if (preg_match('!^[^\.\/\-]+$!', $text) == 1) {
+        //$text = str_replace(" ", "", $text);
+        //preg_match is already handled in showOutput(), so this should never happen
+        if (preg_match('!^[^\.\/\-\ ]+$!', $text)) {
             doError(ERROR_MORSE_M2T_INPUT, 2);
             doError(ERROR_MORSE_TIP_LIST, 0);
         }
 
-        $text = explode("/", $text);
+        if (strpos($text, "/") === false)
+            $text = explode(" ", $text);
+        else {
+            $text = str_replace(" ","",$text); //get rid of all spaces
+            $text = explode("/", $text);
+
+        }
 
         foreach ($text as $temp) {
             //IF NOT RECOGNIZED and it is not empty value make WarningError
@@ -212,7 +217,7 @@ function showOutput($text) {
     //Trim some characters like:
     $text = trim($text); //whitespaces at start and end
     $text = str_replace(array("\r\n", "\r", "\n"), ' ', $text); // newlines
-    $text = preg_replace("/\s\s+/", " ", $text); //multiple spaces
+    //$text = preg_replace("/\s\s+/", " ", $text); //multiple spaces
 
     if ($text == NULL)
         doError(ERROR_EMPTY_INPUT, 2);

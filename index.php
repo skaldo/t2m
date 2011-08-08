@@ -50,7 +50,7 @@ if (isset($_POST['input']))
         <div id="wrapper">
             <div id="left">
                 <form action="index.php" method="POST">
-                    <span class="form">Input:</span>
+                    <span class="form">Morseovka - kódování i dekódování:</span>
                     <textarea rows="6" cols="40" name="input"><?php echo $input ?></textarea>
                     <input type="submit" value="převést" name="ok" class="submit">
                 </form>
@@ -82,12 +82,11 @@ if (isset($_POST['input']))
         </div>
         <div class="cleaner"></div>
         <div id="info_bubble">
-            Dekódování morseovky
-            <ul type="circle">
-                <li>Písmena se oddělují lomítkem <b>/</b> , mezeru zastupují lomítka dvě <b>//</b></li>
-                <li>---</li>
-                <li>TODO: - Pokud ve vstupu pouze cisla, pouzivat specialni zkratky pro morseovku?</li>
-            </ul>
+            Dekódování morseovky: <i>2 možné vstupy</i><br />
+            <li><b>1) </b>písmena se oddělují mezerou, slova více mezerami</li>
+            <li><b>2) </b>písmena se oddělují lomítkem, slova více lomítky (/)</li>
+            <li></li>    
+            <li>TODO: - Pokud ve vstupu pouze cisla, pouzivat specialni zkratky pro morseovku?</li>
             <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
         </div>
     </body>
