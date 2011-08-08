@@ -74,7 +74,7 @@ if (isset($_POST['input']))
                     }
 
                     //echo output here
-                    if (isError(2)!=TRUE)
+                    if (isError(2) != TRUE)
                         echo "<div id=\"output\">" . $output . "</div>";
                 }
                 ?>

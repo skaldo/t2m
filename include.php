@@ -38,20 +38,19 @@ function isError($type) {
         case 1:
             if ($isWarningError == TRUE) {
                 return TRUE;
-                break;
             } else {
                 return FALSE;
-                break;
             }
             break;
+
         case 2:
             if ($isFatalError == TRUE) {
                 return TRUE;
-                break;
             } else {
                 return FALSE;
-                break;
             }
+            break;
+
         default:
             break;
     }
@@ -135,7 +134,7 @@ function morseCode($text, $encode) {
         //MORSECODE ENCODE
         $text = diacriticFree($text);
 
-        //if input is bad, make error,tip and return zero.
+        //if input is bad, make error, show tip and return zero.
         if (!preg_match('!^[a-zA-Z0-9\?\,\!\.\;\/\=\-\(\)\"\:\_\@\ \n\r]+$!', $text)) {
             doError(ERROR_MORSE_T2M_INPUT, 2);
             doError(ERROR_MORSE_TIP_LIST, 0);
@@ -159,7 +158,7 @@ function morseCode($text, $encode) {
         unset($getCh);
 
         foreach ($text as $temp) {
-            
+
             //spaces need to have two slashes, make them without spaces - str_replace hack
             //else return character in morseCode
             if ($morse[$temp][1] == "/") {
@@ -208,7 +207,6 @@ function morseCode($text, $encode) {
 }
 
 function showOutput($text) {
-
     $return = NULL;
 
     //Trim some characters like:

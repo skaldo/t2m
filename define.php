@@ -59,6 +59,6 @@ $morse = array(
 
 $morse_buffer = array();
 foreach ($morse as $temp) {
-        array_push($morse_buffer,$temp[1]);
+    array_push($morse_buffer, $temp[1]);
 }
 ?>
