@@ -1,7 +1,8 @@
 body {
-    text-align: center; /* centrovani pro IE quirk */
+    text-align: center;
     font-family: arial, sans-serif;
 }
+
 ul{
     margin:0 0 0 0;
     padding:0 0 0 0;
@@ -9,9 +10,10 @@ ul{
 }
 
 #wrapper{
-    margin: auto;  /* centrovani standardní prohlížeče */
-    text-align: left; /* ukonceni centrovani */
+    margin: auto;
+    text-align: left;
 }
+
 #left{
     width:350px;
     padding-right: 20px;
