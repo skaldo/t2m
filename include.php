@@ -4,8 +4,11 @@ include "define.php";
 
 $isFatalError = FALSE;
 $isWarningError = FALSE;
+$isTipError = FALSE;
+$isMoreError = FALSE;
 $errorOutput = NULL;
 $tipOutput = NULL;
+$moreOutput = NULL;
 
 //DEFINE ERRORS
 define("ERROR_FATAL", "Chyba:", TRUE);
@@ -30,25 +33,43 @@ function isError($type) {
      *  0 - Tip
      *  1 - Warning
      *  2 - Fatal Error
+     *  3 - Warning: More info
      */
     global $isFatalError;
     global $isWarningError;
+    global $isTipError;
+    global $isMoreError;
 
     switch ($type) {
-        case 1:
-            if ($isWarningError == TRUE) {
+        case 0:
+            if ($isTipError == TRUE)
                 return TRUE;
-            } else {
+            else
                 return FALSE;
-            }
+
+            break;
+
+        case 1:
+            if ($isWarningError == TRUE)
+                return TRUE;
+            else
+                return FALSE;
+
             break;
 
         case 2:
-            if ($isFatalError == TRUE) {
+            if ($isFatalError == TRUE)
                 return TRUE;
-            } else {
+            else
                 return FALSE;
-            }
+
+            break;
+
+        case 3:
+            if ($isMoreError == TRUE)
+                return TRUE;
+            else
+                return FALSE;
             break;
 
         default:
@@ -62,16 +83,25 @@ function doError($text, $type) {
      *  0 - Tip
      *  1 - Warning - CURRENTLY_NOT_USED
      *  2 - Fatal Error
+     *  3 - Warning: More info
      */
 
     global $errorOutput;
     global $tipOutput;
+    global $moreOutput;
     global $isFatalError;
     global $isWarningError;
+    global $isMoreError;
+    global $isTipError;
 
     switch ($type) {
         case 0:
-            $tipOutput .= "<li><span class=\"tip\">" . ERROR_TIP . " </span>" . $text . "</li>";
+            if ((isError(0) == TRUE) && (strpos($tipOutput, $text) !== FALSE)) {
+                //Do nothing.
+            } else {
+                $tipOutput .= "<li><span class=\"tip\">" . ERROR_TIP . " </span>" . $text . "</li>";
+                $isTipError = TRUE;
+            }
             break;
 
         case 1:
@@ -94,38 +124,45 @@ function doError($text, $type) {
             }
             break;
 
+        case 3:
+            //Don't make 2 same errors.
+            if ((isError(3) == TRUE) && (strpos($moreOutput, $text) !== FALSE)) {
+                //Do nothing.
+            } else {
+                $moreOutput .="<li>" . $text . "</li>";
+                $isMoreError = TRUE;
+            }
+            break;
+
         default:
             die("Unhandled exception #1A." . ERROR_UNHANDLED);
             break;
     }
 }
 
-function showError($type) {
+function showError() {
     global $errorOutput;
     global $tipOutput;
-    $return = NULL; //In case there is no error
+    global $moreOutput;
 
-    switch ($type) {
-        case 0:
-            if ($tipOutput != NULL)
-                $return = "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>";
-            break;
+    $return = "";
 
-        case 1:
-        case 2:
-            if ($errorOutput != NULL)
-                $return = "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
-            break;
-
-        default:
-            die("Unhandled exception #1B." . ERROR_UNHANDLED);
-            break;
+    if (isError(2) == TRUE) {
+        $return = "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
+    } else {
+        if (isError(1) == TRUE)
+            $return .= "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
+        if (isError(3) == TRUE)
+            $return .= "<div id=\"moreinfo\"><ul>" . $moreOutput . "</ul></div>";
+        if (isError(0) == TRUE)
+            $return .= "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>";
     }
     return $return;
 }
 
-//text = input text ; encode==TRUE =>text2morse, FALSE=>morse2text
 function morseCode($text, $encode) {
+    //text = input text ; encode==TRUE =>text2morse, FALSE=>morse2text
+
     global $morse;
     global $morse_buffer;
     $return = NULL;
@@ -133,6 +170,7 @@ function morseCode($text, $encode) {
     if ($encode == TRUE) {
         //MORSECODE ENCODE
         $text = diacriticFree($text);
+        $text = strtolower($text);
 
         //if input is bad, make error, show tip and return zero.
         if (!preg_match('!^[a-zA-Z0-9\?\,\!\.\;\/\=\-\(\)\"\:\_\@\ \n\r]+$!', $text)) {
@@ -141,9 +179,8 @@ function morseCode($text, $encode) {
             return 0;
         }
 
-        //do this before the string is splitted
-        //until unset we handle Ch character.
-        $getCh = strpos($text, "ch");
+        //handling Ch character
+        $getCh = strpos($text, "ch");  //do this before the string is splitted
         $text = str_split($text); //the only exception
         if ($getCh !== FALSE) {
             for ($i = 0; $i < count($text) - 1; $i++) {
@@ -158,9 +195,7 @@ function morseCode($text, $encode) {
         unset($getCh);
 
         foreach ($text as $temp) {
-
-            //spaces need to have two slashes, make them without spaces - str_replace hack
-            //else return character in morseCode
+            //spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
             if ($morse[$temp][1] == "/") {
                 $return.= "/ ";
                 $return = str_replace(" / / ", " // ", $return);
@@ -171,9 +206,7 @@ function morseCode($text, $encode) {
     } else {
 
         //MORSECODE DECODE
-        //strip _all_ whitespaces
-        //$text = str_replace(" ", "", $text);
-        //preg_match is already handled in showOutput(), so this should never happen
+        //this is already handled in showOutput(), so this should not happen
         if (preg_match('!^[^\.\/\-\ ]+$!', $text)) {
             doError(ERROR_MORSE_M2T_INPUT, 2);
             doError(ERROR_MORSE_TIP_LIST, 0);
@@ -182,16 +215,18 @@ function morseCode($text, $encode) {
         if (strpos($text, "/") === false)
             $text = explode(" ", $text);
         else {
-            $text = str_replace(" ","",$text); //get rid of all spaces
+            $text = str_replace(" ", "", $text); //get rid of all spaces
             $text = explode("/", $text);
-
         }
 
+        $i = 0;
         foreach ($text as $temp) {
             //IF NOT RECOGNIZED and it is not empty value make WarningError
             if ((!in_array($temp, $morse_buffer)) && ($temp !== "")) {
-                $return .= "*<span class=\"red error\">" . $temp . "</span>*";
+                $localError = ($i + 1).". písmeno";
+                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: ".diacriticfree($localError)."'>*</span>";
                 doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
+                doError("<span class=\"red error\">Chyba je poblíž: </span>".$localError, 3);
             }
 
             //IF SPACE
@@ -204,6 +239,7 @@ function morseCode($text, $encode) {
                     }
                 }
             }
+            $i++;
         }
         //Comment this for uppercase output
         $return = strtolower($return);
@@ -219,12 +255,13 @@ function showOutput($text) {
     $text = str_replace(array("\r\n", "\r", "\n"), ' ', $text); // newlines
     //$text = preg_replace("/\s\s+/", " ", $text); //multiple spaces
 
-    if ($text == NULL)
+    //we don't want to continue if we have already Fatal Error or if we encounter this
+    if ($text == NULL){
         doError(ERROR_EMPTY_INPUT, 2);
-
-    //we don't want to continue if we have already Fatal Error
-    global $isFatalError;
-    if ($isFatalError == TRUE)
+        return;
+    }
+    
+    if (isError(2) == TRUE)
         return;
 
     //MORSECODE

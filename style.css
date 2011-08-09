@@ -33,10 +33,19 @@ ul{
     border: 1px solid red;
     background: url("warning.png") no-repeat right center #FFF9D7;
     padding: .5em 5em .5em .5em;
-    margin: 1em 0 2em 0;
+    margin: 1em 0 1em 0;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
+}
+
+#moreinfo{
+    border: 1px solid black;
+    margin-bottom: 1em;
+    padding: 5px;
+    line-height: 1.5em;
+    max-height: 30%;
+    overflow:auto;
 }
 
 #tip{

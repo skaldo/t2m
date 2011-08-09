@@ -8,14 +8,18 @@ $starttime = $mtime;
 /*
  * TODO:
  * H: Max input length?
+ * H: Still better error handling - too much code and variables
+ * H: Better error position show - prev. two and next two chars.
  * 
+ * M: More info <div>
  * M: Better UI
  * 
  * L: SEO optimize? - discussion: be a script or web page/script
- * 
- * F: oddělovač vět?
+
+ * F: sentence divider?
+ * F: Add check button for Ch letter -> only for slavonic languages
+ * F: input only numbers - make them short? (wiki)
  * F: Add more encode/decode
- *      * ruzne sifry s posunem slov
  *      * base64() encode decode?
  */
 
@@ -57,23 +61,8 @@ if (isset($_POST['input']))
             <div id="right">
                 <?php
                 if ($ok == 1) {
-                    //do this before errors, we want to have errors on top without using CSS position:abs/rel
-                    //put output into $output, echo later
-                    $output = showOutput($input);
-
-                    //is there an error?
-                    if (showError(2) != NULL) {
-                        echo showError(2);
-                    }
-
-                    //is there an tip?
-                    if (showError(0) != NULL) {
-                        echo showError(0);
-                    }
-
-                    //echo output here
-                    if (isError(2) != TRUE)
-                        echo "<div id=\"output\">" . $output . "</div>";
+                    echo showError();
+                    echo showOutput($input);
                 }
                 ?>
             </div>
@@ -85,12 +74,12 @@ if (isset($_POST['input']))
                 <li><b>1) </b>písmena se oddělují mezerou, slova více mezerami</li>
                 <li><b>2) </b>písmena se oddělují lomítkem, slova více lomítky (/)</li>
                 <li></li>    
-                <li>TODO: - Pokud ve vstupu pouze cisla, pouzivat specialni zkratky pro morseovku?</li>
             </ul>
             <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
         </div>
     </body>
 </html>
+
 <?php
 $mtime = microtime();
 $mtime = explode(" ", $mtime);
