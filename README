@@ -21,15 +21,15 @@ in August 2011.
 
 For futher information please visit:
     Git repository:     https://github.com/evandar/t2m/
+    Website:            http://www.evandar.cz/skripty/t2m/
+    Author's twitter:   @evandar
     Author's website:   http://www.evandar.cz
     
-
 = T2M -- INSTALL =
 
 This software requires:
     * PHP 5.2
 
 How to run:
-    * Just copy & paste
     * Run index.php
     * Profit
