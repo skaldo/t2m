@@ -7,7 +7,7 @@ $starttime = $mtime;
 
 /*
  * TODO:
- * H: Max $_POST length?
+ * H: Max input length?
  * 
  * M: Better UI
  * 
@@ -15,8 +15,6 @@ $starttime = $mtime;
  * 
  * F: oddělovač vět?
  * F: Add more encode/decode
- *      * if so, rewrite m2t and t2m. Rename to morseCode (morse()?) and add 
- *          parameter - encode=BOOL (ok?) => morseCode("hello world",true);
  *      * ruzne sifry s posunem slov
  *      * base64() encode decode?
  */
@@ -82,11 +80,13 @@ if (isset($_POST['input']))
         </div>
         <div class="cleaner"></div>
         <div id="info_bubble">
-            Dekódování morseovky: <i>2 možné vstupy</i><br />
-            <li><b>1) </b>písmena se oddělují mezerou, slova více mezerami</li>
-            <li><b>2) </b>písmena se oddělují lomítkem, slova více lomítky (/)</li>
-            <li></li>    
-            <li>TODO: - Pokud ve vstupu pouze cisla, pouzivat specialni zkratky pro morseovku?</li>
+            Dekódování morseovky: <i>2 možné vstupy</i><br>
+            <ul type="square">
+                <li><b>1) </b>písmena se oddělují mezerou, slova více mezerami</li>
+                <li><b>2) </b>písmena se oddělují lomítkem, slova více lomítky (/)</li>
+                <li></li>    
+                <li>TODO: - Pokud ve vstupu pouze cisla, pouzivat specialni zkratky pro morseovku?</li>
+            </ul>
             <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
         </div>
     </body>
