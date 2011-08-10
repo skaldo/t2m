@@ -17,7 +17,6 @@ define("ERROR_TIP", "Tip:", TRUE);
 define("ERROR_EMPTY_INPUT", "Nezapomněli jste na něco?", TRUE);
 define("ERROR_UNHANDLED", "Please remember what you were doint and contact administrator<br />To continue reload page or press F5.", TRUE);
 define("ERROR_MORSE_T2M_INPUT", "Vstup je pro morseovu abecedu neplatný. Více info.", TRUE);
-define("ERROR_MORSE_M2T_INPUT", "Vstup je neplatný. Morseova abeceda pracuje pouze se znaky <b>/</b> ,<b>-</b> a <b>.</b>", TRUE);
 define("ERROR_MORSE_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno. Více info.", TRUE);
 define("ERROR_MORSE_TIP_LIST", "Máte problémy s Morseovou abecedou? Podívejte se na <a href=\"help.html\" onclick=\"return popup('help.html')\">seznam znaků</a>!</span>", TRUE);
 
@@ -167,6 +166,7 @@ function morseCode($text, $encode) {
     global $morse;
     global $morse_buffer;
     $return = NULL;
+    $i = 0;
 
     if ($encode == TRUE) {
         //MORSECODE ENCODE
@@ -188,7 +188,6 @@ function morseCode($text, $encode) {
         }
         unset($getCh);
 
-        $i = 0;
         foreach ($text as $temp) {
             //spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
             if (!array_key_exists($temp, $morse)) {
@@ -198,56 +197,38 @@ function morseCode($text, $encode) {
                 if (($i + 1) != count($text)) {
                     $return .= " / ";
                 }
-            } elseif ($morse[$temp][1] == "/") {
+            } elseif ($morse[$temp] == "/") {
                 $return.= "/ ";
                 $return = str_replace(" / / ", " // ", $return);
             } else {
-                $return.= $morse[$temp][1] . " / ";
+                $return.= $morse[$temp] . " / ";
             }
             $i++;
         }
-        unset($i);
     } else {
 
-        //MORSECODE DECODE
-        //this is already handled in showOutput(), so this should not happen
-        if (preg_match('!^[^\.\/\-\ ]+$!', $text)) {
-            doError(ERROR_MORSE_M2T_INPUT, 2);
-            doError(ERROR_MORSE_TIP_LIST, 0);
-        }
-
+        //MORSECODE DECODE, input check is handled in showOutput()
         if (strpos($text, "/") === false)
-            $text = explode(" ", $text);
+            $text = explode(" ", $text);            // split by space
         else {
-            $text = str_replace(" ", "", $text); //get rid of all spaces
-            $text = explode("/", $text);
+            $text = str_replace(" ", "", $text);    //get rid of all spaces
+            $text = explode("/", $text);            //and split by /
         }
 
-        $i = 0;
         foreach ($text as $temp) {
-            //IF NOT RECOGNIZED and it is not empty value make WarningError
-            if ((!in_array($temp, $morse_buffer)) && ($temp !== "")) {
+            //IF SPACE
+            if ($temp == "") {
+                $return .= " ";
+            } elseif ((!in_array($temp, $morse))) {
                 $localError = ($i + 1) . ". písmeno: ";
                 $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . diacriticfree($localError) . "'>*</span>";
                 doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
                 doError("<span class=\"red error\">Chyba je poblíž: </span>" . $localError . " (<span class=\"red\">" . $temp . "</span>)", 3);
-            }
-
-            //IF SPACE
-            if ($temp == "") {
-                $return .= " ";
-            } else {
-                foreach ($morse as $temp2) {
-                    if ($temp == $temp2[1]) {
-                        $return .= $temp2[0];
-                    }
-                }
+            } elseif (in_array($temp, $morse)) {
+                echo array_search($temp, $morse);
             }
             $i++;
         }
-        unset($i);
-        //Comment this for uppercase output
-        $return = strtolower($return);
     }
     return $return;
 }
