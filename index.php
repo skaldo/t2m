@@ -13,6 +13,7 @@ $starttime = $mtime;
  * 
  * M: More info <div>
  * M: Better UI
+ * M: Variables rename
  * 
  * L: SEO optimize? - discussion: be a script or web page/script
 

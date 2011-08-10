@@ -1,5 +1,8 @@
 <?php
 
+// ... oh wait
+//error_reporting(E_ALL ^ E_NOTICE);
+
 include "define.php";
 
 $isFatalError = FALSE;
@@ -97,7 +100,7 @@ function doError($text, $type) {
     switch ($type) {
         case 0:
             if ((isError(0) == TRUE) && (strpos($tipOutput, $text) !== FALSE)) {
-                //Do nothing.
+//Do nothing.
             } else {
                 $tipOutput .= "<li><span class=\"tip\">" . ERROR_TIP . " </span>" . $text . "</li>";
                 $isTipError = TRUE;
@@ -105,9 +108,9 @@ function doError($text, $type) {
             break;
 
         case 1:
-            //Don't make 2 same warnings.
+//Don't make 2 same warnings.
             if ((isError(1) == TRUE) && (strpos($errorOutput, $text) !== FALSE)) {
-                //Do nothing.
+//Do nothing.
             } else {
                 $errorOutput .= "<li><span class=\"error warning\">" . ERROR_WARNING . " </span>" . $text . "</li>";
                 $isWarningError = TRUE; //make other know that we got warning error over here!
@@ -115,9 +118,9 @@ function doError($text, $type) {
             break;
 
         case 2:
-            //Don't make 2 same errors.
+//Don't make 2 same errors.
             if ((isError(2) == TRUE) && (strpos($errorOutput, $text) !== FALSE)) {
-                //Do nothing.
+//Do nothing.
             } else {
                 $errorOutput .="<li><span class=\"error fatal\">" . ERROR_FATAL . " </span>" . $text . "</li>";
                 $isFatalError = TRUE;
@@ -125,9 +128,9 @@ function doError($text, $type) {
             break;
 
         case 3:
-            //Don't make 2 same errors.
+//Don't make 2 same errors.
             if ((isError(3) == TRUE) && (strpos($moreOutput, $text) !== FALSE)) {
-                //Do nothing.
+//Do nothing.
             } else {
                 $moreOutput .="<li>" . $text . "</li>";
                 $isMoreError = TRUE;
@@ -149,45 +152,38 @@ function showError() {
 
     if (isError(2) == TRUE) {
         $return = "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
-    } else {
-        if (isError(1) == TRUE)
-            $return .= "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
+    } elseif (isError(1) == TRUE) {
+        $return .= "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
         if (isError(3) == TRUE)
             $return .= "<div id=\"moreinfo\"><ul>" . $moreOutput . "</ul></div>";
     }
+
     if (isError(0) == TRUE)
         $return .= "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>";
-    
+
     return $return;
 }
 
 function morseCode($text, $encode) {
-    //text = input text ; encode==TRUE =>text2morse, FALSE=>morse2text
+//text = input text ; encode==TRUE =>text2morse, FALSE=>morse2text
 
     global $morse;
     global $morse_buffer;
     $return = NULL;
 
     if ($encode == TRUE) {
-        //MORSECODE ENCODE
+//MORSECODE ENCODE
         $text = diacriticFree($text);
         $text = strtolower($text);
 
-        //if input is bad, make error, show tip and return zero.
-        if (!preg_match('!^[a-zA-Z0-9\?\,\!\.\;\/\=\-\(\)\"\:\_\@\ \n\r]+$!', $text)) {
-            doError(ERROR_MORSE_T2M_INPUT, 2);
-            doError(ERROR_MORSE_TIP_LIST, 0);
-            return 0;
-        }
-
-        //handling Ch character
         $getCh = strpos($text, "ch");  //do this before the string is splitted
         $text = str_split($text); //the only exception
+//handling Ch character
         if ($getCh !== FALSE) {
             for ($i = 0; $i < count($text) - 1; $i++) {
                 if (($text[$i] == "c") && ($text[$i + 1] == "h")) {
                     $text[$i] = "ch";
-                    //delete H and re-index array
+//delete H and re-index array
                     unset($text[$i + 1]);
                     $text = array_values($text);
                 }
@@ -195,19 +191,29 @@ function morseCode($text, $encode) {
         }
         unset($getCh);
 
+        $i = 0;
         foreach ($text as $temp) {
-            //spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
-            if ($morse[$temp][1] == "/") {
+//spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
+            if (!array_key_exists ($temp, $morse)) {
+                doError(ERROR_MORSE_T2M_INPUT, 1);
+                doError("<span class=\"red error\">Chyba je poblíž: </span>" . ($i+1).". písmeno (<span class=\"red\">".$temp."</span>)", 3);
+                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: ".($i+1)."'>*</span>";
+                if (($i+1)!=count($text)){
+                    $return .= " / ";
+                }
+            } elseif ($morse[$temp][1] == "/") {
                 $return.= "/ ";
                 $return = str_replace(" / / ", " // ", $return);
             } else {
                 $return.= $morse[$temp][1] . " / ";
             }
+            $i++;
         }
+        unset($i);
     } else {
 
-        //MORSECODE DECODE
-        //this is already handled in showOutput(), so this should not happen
+//MORSECODE DECODE
+//this is already handled in showOutput(), so this should not happen
         if (preg_match('!^[^\.\/\-\ ]+$!', $text)) {
             doError(ERROR_MORSE_M2T_INPUT, 2);
             doError(ERROR_MORSE_TIP_LIST, 0);
@@ -222,15 +228,15 @@ function morseCode($text, $encode) {
 
         $i = 0;
         foreach ($text as $temp) {
-            //IF NOT RECOGNIZED and it is not empty value make WarningError
+//IF NOT RECOGNIZED and it is not empty value make WarningError
             if ((!in_array($temp, $morse_buffer)) && ($temp !== "")) {
-                $localError = ($i + 1) . ". písmeno";
+                $localError = ($i + 1) . ". písmeno: ";
                 $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . diacriticfree($localError) . "'>*</span>";
                 doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
-                doError("<span class=\"red error\">Chyba je poblíž: </span>" . $localError, 3);
+                doError("<span class=\"red error\">Chyba je poblíž: </span>" . $localError . " (<span class=\"red\">" . $temp . "</span>)", 3);
             }
 
-            //IF SPACE
+//IF SPACE
             if ($temp == "") {
                 $return .= " ";
             } else {
@@ -242,7 +248,8 @@ function morseCode($text, $encode) {
             }
             $i++;
         }
-        //Comment this for uppercase output
+        unset($i);
+//Comment this for uppercase output
         $return = strtolower($return);
     }
     return $return;
@@ -251,11 +258,10 @@ function morseCode($text, $encode) {
 function showOutput($text) {
     $return = NULL;
 
-    //Trim some characters like:
+//Trim some characters like:
     $text = trim($text); //whitespaces at start and end
     $text = str_replace(array("\r\n", "\r", "\n"), ' ', $text); // newlines
-    //$text = preg_replace("/\s\s+/", " ", $text); //multiple spaces
-    //we don't want to continue if we have already Fatal Error or if we encounter this
+//we don't want to continue if we have already Fatal Error or if we encounter this
     if ($text == NULL) {
         doError(ERROR_EMPTY_INPUT, 2);
         return;
@@ -264,9 +270,9 @@ function showOutput($text) {
     if (isError(2) == TRUE)
         return;
 
-    //MORSECODE
-    //if something goes wrong, just make an error during t2m/m2t
-    //check for the only chars available in MorseCode (.-/) + \r\n (newline)
+//MORSECODE
+//if something goes wrong, just make an error during t2m/m2t
+//check for the only chars available in MorseCode (.-/) + \r\n (newline)
     if (preg_match('/^[\ \-\.\/\n\r]+$/i', $text)) {
         $return = morseCode($text, FALSE);
     } else {
