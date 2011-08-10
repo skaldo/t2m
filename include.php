@@ -154,9 +154,10 @@ function showError() {
             $return .= "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
         if (isError(3) == TRUE)
             $return .= "<div id=\"moreinfo\"><ul>" . $moreOutput . "</ul></div>";
-        if (isError(0) == TRUE)
-            $return .= "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>";
     }
+    if (isError(0) == TRUE)
+        $return .= "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>";
+    
     return $return;
 }
 
@@ -223,10 +224,10 @@ function morseCode($text, $encode) {
         foreach ($text as $temp) {
             //IF NOT RECOGNIZED and it is not empty value make WarningError
             if ((!in_array($temp, $morse_buffer)) && ($temp !== "")) {
-                $localError = ($i + 1).". písmeno";
-                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: ".diacriticfree($localError)."'>*</span>";
+                $localError = ($i + 1) . ". písmeno";
+                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . diacriticfree($localError) . "'>*</span>";
                 doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
-                doError("<span class=\"red error\">Chyba je poblíž: </span>".$localError, 3);
+                doError("<span class=\"red error\">Chyba je poblíž: </span>" . $localError, 3);
             }
 
             //IF SPACE
@@ -254,13 +255,12 @@ function showOutput($text) {
     $text = trim($text); //whitespaces at start and end
     $text = str_replace(array("\r\n", "\r", "\n"), ' ', $text); // newlines
     //$text = preg_replace("/\s\s+/", " ", $text); //multiple spaces
-
     //we don't want to continue if we have already Fatal Error or if we encounter this
-    if ($text == NULL){
+    if ($text == NULL) {
         doError(ERROR_EMPTY_INPUT, 2);
         return;
     }
-    
+
     if (isError(2) == TRUE)
         return;
 

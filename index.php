@@ -61,8 +61,11 @@ if (isset($_POST['input']))
             <div id="right">
                 <?php
                 if ($ok == 1) {
+                    $output = showOutput($input);
                     echo showError();
-                    echo showOutput($input);
+                    if (isError(2) != TRUE) {
+                        echo $output;
+                    }
                 }
                 ?>
             </div>
