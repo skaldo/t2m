@@ -15,7 +15,8 @@ $starttime = $mtime;
  * M: Variables rename
  * 
  * L: SEO optimize? - discussion: be a script or web page/script
-
+ * L: javascript check for no form input
+ *
  * F: sentence divider?
  * F: Add check button for Ch letter -> only for slavonic languages
  * F: input only numbers - make them short? (wiki)
@@ -67,7 +68,9 @@ if (isset($_POST['input']))
                 <?php
                 if ($ok == 1) {
                     $output = showOutput($input);
+                    
                     echo showError();
+                    
                     if (isError(2) != TRUE) {
                         echo $output;
                     }

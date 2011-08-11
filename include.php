@@ -175,7 +175,7 @@ function showError() {
     return $return;
 }
 
-function morseCode($text, $encode) {
+function morseCode($input, $encode) {
     //text = input text ; encode==TRUE =>text2morse, FALSE=>morse2text
 
     global $morse;
@@ -185,25 +185,25 @@ function morseCode($text, $encode) {
 
     if ($encode == TRUE) {
         //MORSECODE ENCODE
-        $text = diacriticFree($text);
-        $text = strtolower($text);
+        $input = diacriticFree($input);
+        $input = strtolower($input);
 
-        $getCh = strpos($text, "ch");  //do this before the string is splitted
-        $text = str_split($text); //the only exception
+        $getCh = strpos($input, "ch");  //do this before the string is splitted
+        $input = str_split($input); //the only exception
         //handling Ch character
         if ($getCh !== FALSE) {
-            for ($i = 0; $i < count($text) - 1; $i++) {
-                if (($text[$i] == "c") && ($text[$i + 1] == "h")) {
-                    $text[$i] = "ch";
+            for ($i = 0; $i < count($input) - 1; $i++) {
+                if (($input[$i] == "c") && ($input[$i + 1] == "h")) {
+                    $input[$i] = "ch";
                     //delete H and re-index array
-                    unset($text[$i + 1]);
-                    $text = array_values($text);
+                    unset($input[$i + 1]);
+                    $input = array_values($input);
                 }
             }
         }
         unset($getCh);
 
-        foreach ($text as $temp) {
+        foreach ($input as $temp) {
             //spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
             if (!array_key_exists($temp, $morse)) {
                 doError(ERROR_MORSE_T2M_INPUT, 1);
@@ -211,7 +211,7 @@ function morseCode($text, $encode) {
                 $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . ($i + 1) . "'>*</span>";
                 doError(ERROR_MORSE_TIP_LIST, 0);
 
-                if (($i + 1) != count($text)) {
+                if (($i + 1) != count($input)) {
                     $return .= " / ";
                 }
             } elseif ($morse[$temp] == "/") {
@@ -225,14 +225,14 @@ function morseCode($text, $encode) {
     } else {
 
         //MORSECODE DECODE, input check is handled in showOutput()
-        if (strpos($text, "/") === false)
-            $text = explode(" ", $text);            // split by space
+        if (strpos($input, "/") === FALSE)
+            $input = explode(" ", $input);            // split by space
         else {
-            $text = str_replace(" ", "", $text);    //get rid of all spaces
-            $text = explode("/", $text);            //and split by /
+            $input = str_replace(" ", "", $input);    //get rid of all spaces
+            $input = explode("/", $input);            //and split by /
         }
 
-        foreach ($text as $temp) {
+        foreach ($input as $temp) {
             //IF SPACE
             if ($temp == "") {
                 $return .= " ";
@@ -250,15 +250,15 @@ function morseCode($text, $encode) {
     return $return;
 }
 
-function showOutput($text) {
+function showOutput($input) {
     $return = NULL;
     global $config;
 
     if ((isset($config['input_length'])) && ($config['input_length'] != "")) {
         //in utf8 "č" is 2 bytes long, but it counts as one
         //if we use latin1, it is converted - so it counts as two
-        if (mb_strlen($text, 'latin1') > $config['input_length']) {
-            $lengthDiff = ((mb_strlen($text, 'latin1')) - $config['input_length']);
+        if (mb_strlen($input, 'latin1') > $config['input_length']) {
+            $lengthDiff = ((mb_strlen($input, 'latin1')) - $config['input_length']);
             
             if ($lengthDiff < 1024) {
                 $lengthDiff .= " bytes";
@@ -273,24 +273,25 @@ function showOutput($text) {
     }
 
     //Trim some characters like:
-    $text = trim($text); //whitespaces at start and end
-    $text = str_replace(array("\r\n", "\r", "\n"), ' ', $text); // newlines
-    //we don't want to continue if we have already Fatal Error or if we encounter this
-    if ($text == NULL) {
+    $input = trim($input); //whitespaces at start and end
+    $input = str_replace(array("\r\n", "\r", "\n"), ' ', $input); // newlines
+
+    //we don't want to continue if we have already fatal error or when no input (todo: check by javascript in form)
+    if (isError(2) == TRUE)
+        return;
+    
+    if ($input == NULL) {
         doError(ERROR_INPUT_EMPTY, 2);
         return;
     }
 
-    if (isError(2) == TRUE)
-        return;
-
     //MORSECODE
     //if something goes wrong, just make an error during t2m/m2t
     //check for the only chars available in MorseCode (.-/) + \r\n (newline)
-    if (preg_match('/^[\ \-\.\/\n\r]+$/i', $text)) {
-        $return = morseCode($text, FALSE);
+    if (preg_match('/^[\ \-\.\/\n\r]+$/i', $input)) {
+        $return = morseCode($input, FALSE);
     } else {
-        $return = morseCode($text, TRUE);
+        $return = morseCode($input, TRUE);
     }
 
     return $return;
