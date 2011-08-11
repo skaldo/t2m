@@ -1,5 +1,19 @@
 <?php
 
+/*
+ * ***********
+ * * Config **
+ * ***********
+ * input_length:  - max length of input string. If empty, post_max_size in php.ini is used. In bytes.
+ * 
+ */
+
+$config['input_length'] = "1048576"; //1M - that is about 850k chars in czech (really? :) )
+
+/*
+ * Config end
+ */
+
 include "define.php";
 
 $isFatalError = FALSE;
@@ -14,7 +28,8 @@ $moreOutput = NULL;
 define("ERROR_FATAL", "Chyba:", TRUE);
 define("ERROR_WARNING", "Upozornění:", TRUE);
 define("ERROR_TIP", "Tip:", TRUE);
-define("ERROR_EMPTY_INPUT", "Nezapomněli jste na něco?", TRUE);
+define("ERROR_INPUT_SIZE_EXCEEDED", "Překročili jste maximální velikost vstupu ", TRUE);
+define("ERROR_INPUT_EMPTY", "Nezapomněli jste na něco?", TRUE);
 define("ERROR_UNHANDLED", "Please remember what you were doint and contact administrator<br />To continue reload page or press F5.", TRUE);
 define("ERROR_MORSE_T2M_INPUT", "Vstup je pro morseovu abecedu neplatný. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
 define("ERROR_MORSE_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
@@ -237,13 +252,32 @@ function morseCode($text, $encode) {
 
 function showOutput($text) {
     $return = NULL;
+    global $config;
+
+    if ((isset($config['input_length'])) && ($config['input_length'] != "")) {
+        //in utf8 "č" is 2 bytes long, but it counts as one
+        //if we use latin1, it is converted - so it counts as two
+        if (mb_strlen($text, 'latin1') > $config['input_length']) {
+            $lengthDiff = ((mb_strlen($text, 'latin1')) - $config['input_length']);
+            
+            if ($lengthDiff < 1024) {
+                $lengthDiff .= " bytes";
+            } elseif (($rozdil > 1024) && ($lengthDiff < 1048576)) {
+                $lengthDiff = round($lengthDiff / 1024) . " kilobytes";
+            } else {
+                $lengthDiff = round($lengthDiff / 1024 / 1024) . " megabytes";
+            }
+            
+            doError(ERROR_INPUT_SIZE_EXCEEDED . "o " . $lengthDiff, 2);
+        }
+    }
 
     //Trim some characters like:
     $text = trim($text); //whitespaces at start and end
     $text = str_replace(array("\r\n", "\r", "\n"), ' ', $text); // newlines
     //we don't want to continue if we have already Fatal Error or if we encounter this
     if ($text == NULL) {
-        doError(ERROR_EMPTY_INPUT, 2);
+        doError(ERROR_INPUT_EMPTY, 2);
         return;
     }
 

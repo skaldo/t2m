@@ -7,11 +7,10 @@ $starttime = $mtime;
 
 /*
  * TODO:
- * H: Max input length?
  * H: Still better error handling - too much code and variables
  * H: Better error position show - prev. two and next two chars.
+ * H: Code cleanup
  * 
- * M: More info <div>
  * M: Better UI
  * M: Variables rename
  * 
