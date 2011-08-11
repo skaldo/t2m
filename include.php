@@ -220,12 +220,11 @@ function morseCode($text, $encode) {
             if ($temp == "") {
                 $return .= " ";
             } elseif ((!in_array($temp, $morse))) {
-                $localError = ($i + 1) . ". písmeno: ";
-                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . diacriticfree($localError) . "'>*</span>";
+                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " .($i+1) . ". pismeno'>*</span>";
                 doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
-                doError("<span class=\"red error\">Chyba je poblíž: </span>" . $localError . " (<span class=\"red\">" . $temp . "</span>)", 3);
+                doError("<span class=\"red error\">Chyba je poblíž: </span>" . ($i + 1) . ". písmeno: (<span class=\"red\">" . $temp . "</span>)", 3);
             } elseif (in_array($temp, $morse)) {
-                echo array_search($temp, $morse);
+                $return.= array_search($temp, $morse);
             }
             $i++;
         }
