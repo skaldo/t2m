@@ -29,7 +29,6 @@ ul{
 }
 
 #error{
-    text-align:left;
     border: 1px solid red;
     background: url("warning.png") no-repeat right center #FFF9D7;
     padding: .5em 5em .5em .5em;
@@ -49,9 +48,8 @@ ul{
 }
 
 #tip{
-    text-align:left;
     border: 1px solid green;
-    background: url("warning.png") no-repeat right center #FFF9D7;
+    background: #FFF9D7;
     padding: .5em 5em .5em .5em;
     margin: 1em 0 2em 0;
     -webkit-border-radius: 10px;
@@ -82,11 +80,17 @@ ul{
 }
 
 .form {font-size:.8em;}
-.error{font-weight:bold;}
-.tip{font-weight:bold;}
-.fatal{}
-.warning{}
-.red{color:red;}
+.error {font-weight:bold;}
+.tip {font-weight:bold;}
+.fatal {}
+.warning {}
+.red {color:red;}
+.hidden {display: none;}
+
+.hide {
+    text-align: right; /* why this does not work? */
+    font-size:.7em;
+}
 
 .cleaner {
     clear:both;

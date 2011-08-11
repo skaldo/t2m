@@ -46,6 +46,11 @@ if (isset($_POST['input']))
                 if (window.focus) {newwindow.focus()}
                 return false;
             }
+            
+            function changeVisibility(id){
+                el=document.getElementById(id).style; 
+                el.display=(el.display == 'block')?'none':'block';
+            }
             // -->
         </script>
     </head>
@@ -77,7 +82,7 @@ if (isset($_POST['input']))
             <ul type="square">
                 <li><b>1) </b>písmena se oddělují mezerou, slova více mezerami</li>
                 <li><b>2) </b>písmena se oddělují lomítkem, slova více lomítky (/)</li>
-		<li><b>3) </b>tyto dva způsoby nelze směšovat!</li>
+                <li><b>3) </b>tyto dva způsoby nelze směšovat!</li>
                 <li></li>    
             </ul>
             <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>

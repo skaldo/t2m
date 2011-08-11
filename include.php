@@ -16,8 +16,8 @@ define("ERROR_WARNING", "Upozornění:", TRUE);
 define("ERROR_TIP", "Tip:", TRUE);
 define("ERROR_EMPTY_INPUT", "Nezapomněli jste na něco?", TRUE);
 define("ERROR_UNHANDLED", "Please remember what you were doint and contact administrator<br />To continue reload page or press F5.", TRUE);
-define("ERROR_MORSE_T2M_INPUT", "Vstup je pro morseovu abecedu neplatný. Více info.", TRUE);
-define("ERROR_MORSE_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno. Více info.", TRUE);
+define("ERROR_MORSE_T2M_INPUT", "Vstup je pro morseovu abecedu neplatný. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
+define("ERROR_MORSE_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
 define("ERROR_MORSE_TIP_LIST", "Máte problémy s Morseovou abecedou? Podívejte se na <a href=\"help.html\" onclick=\"return popup('help.html')\">seznam znaků</a>!</span>", TRUE);
 
 function diacriticFree($text) {
@@ -147,15 +147,15 @@ function showError() {
     $return = "";
 
     if (isError(2) == TRUE) {
-        $return = "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
+        $return = "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>\n";
     } elseif (isError(1) == TRUE) {
-        $return .= "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>";
+        $return .= "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>\n";
         if (isError(3) == TRUE)
-            $return .= "<div id=\"moreinfo\"><ul>" . $moreOutput . "</ul></div>";
+            $return .= "<div id=\"moreinfo\" class=\"hidden\"><ul>" . $moreOutput . "</ul><span class=\"hide\" onclick=\"changeVisibility('moreinfo')\">(Skrýt)</span></div>\n";
     }
 
     if (isError(0) == TRUE)
-        $return .= "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>";
+        $return .= "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>\n";
 
     return $return;
 }
@@ -194,6 +194,8 @@ function morseCode($text, $encode) {
                 doError(ERROR_MORSE_T2M_INPUT, 1);
                 doError("<span class=\"red error\">Chyba je poblíž: </span>" . ($i + 1) . ". písmeno (<span class=\"red\">" . $temp . "</span>)", 3);
                 $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . ($i + 1) . "'>*</span>";
+                doError(ERROR_MORSE_TIP_LIST, 0);
+
                 if (($i + 1) != count($text)) {
                     $return .= " / ";
                 }
@@ -220,9 +222,10 @@ function morseCode($text, $encode) {
             if ($temp == "") {
                 $return .= " ";
             } elseif ((!in_array($temp, $morse))) {
-                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " .($i+1) . ". pismeno'>*</span>";
+                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . ($i + 1) . ". pismeno'>*</span>";
                 doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
                 doError("<span class=\"red error\">Chyba je poblíž: </span>" . ($i + 1) . ". písmeno: (<span class=\"red\">" . $temp . "</span>)", 3);
+                doError(ERROR_MORSE_TIP_LIST, 0);
             } elseif (in_array($temp, $morse)) {
                 $return.= array_search($temp, $morse);
             }
