@@ -25,15 +25,8 @@ $starttime = $mtime;
  */
 
 require_once "include.php";
-
-if (isset($_POST['ok']))
-    $ok = 1; else
-    $ok = 0;
-
-if (isset($_POST['input']))
-    $input = $_POST['input']; else
-    $input = NULL;
 ?>
+
 <html>
     <head>
         <LINK REL=StyleSheet HREF="style.css" TYPE="text/css" MEDIA=screen>
@@ -59,18 +52,18 @@ if (isset($_POST['input']))
             <div id="left">
                 <form action="index.php" method="POST">
                     <span class="form">Morseovka - kódování i dekódování:</span>
-                    <textarea rows="6" cols="40" name="input"><?php echo $input ?></textarea>
+                    <textarea rows="6" cols="40" name="input"><?php if(isset($_POST['input'])) echo $_POST['input']; ?></textarea>
                     <input type="submit" value="převést" name="ok" class="submit">
                 </form>
             </div>
 
             <div id="right">
                 <?php
-                if ($ok == 1) {
-                    $output = showOutput($input);
-                    
+                if (isset($_POST['input'])) {
+                    $output = showOutput($_POST['input']);
+
                     echo showError();
-                    
+
                     if (isError(2) != TRUE) {
                         echo $output;
                     }

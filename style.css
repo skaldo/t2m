@@ -39,12 +39,17 @@ ul{
 }
 
 #moreinfo{
-    border: 1px solid black;
+    border: 1px solid red;
+    background: #FFF9D7;
     margin-bottom: 1em;
     padding: 5px;
     line-height: 1.5em;
     max-height: 30%;
     overflow:auto;
+    font-size: .9em;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
 }
 
 #tip{

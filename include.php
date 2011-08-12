@@ -16,18 +16,25 @@ $config['input_length'] = "1048576"; //1M - that is about 850k chars in czech (r
 
 include "define.php";
 
-$isFatalError = FALSE;
-$isWarningError = FALSE;
-$isTipError = FALSE;
-$isMoreError = FALSE;
-$errorOutput = NULL;
-$tipOutput = NULL;
-$moreOutput = NULL;
+$isError = array(
+    0 => FALSE, // Tip
+    1 => FALSE, // Warning
+    2 => FALSE, // Fatal
+    3 => FALSE  // show more details, req warning (1) to work
+);
+
+$errorOutput = array(
+    0 => "", // Tip
+    1 => "", // Warn
+    2 => "", // Fatal
+    3 => ""  // show more details, req warning (1) to work
+);
 
 //DEFINE ERRORS
 define("ERROR_FATAL", "Chyba:", TRUE);
 define("ERROR_WARNING", "Upozornění:", TRUE);
 define("ERROR_TIP", "Tip:", TRUE);
+define("ERROR_INPUT_ERROR_NEAR", "Chyba je poblíž: ", TRUE);
 define("ERROR_INPUT_SIZE_EXCEEDED", "Překročili jste maximální velikost vstupu ", TRUE);
 define("ERROR_INPUT_EMPTY", "Nezapomněli jste na něco?", TRUE);
 define("ERROR_UNHANDLED", "Please remember what you were doint and contact administrator<br />To continue reload page or press F5.", TRUE);
@@ -49,128 +56,61 @@ function isError($type) {
      *  2 - Fatal Error
      *  3 - Warning: More info
      */
-    global $isFatalError;
-    global $isWarningError;
-    global $isTipError;
-    global $isMoreError;
+    global $isError;
 
-    switch ($type) {
-        case 0:
-            if ($isTipError == TRUE)
-                return TRUE;
-            else
-                return FALSE;
-
-            break;
-
-        case 1:
-            if ($isWarningError == TRUE)
-                return TRUE;
-            else
-                return FALSE;
-
-            break;
-
-        case 2:
-            if ($isFatalError == TRUE)
-                return TRUE;
-            else
-                return FALSE;
-
-            break;
-
-        case 3:
-            if ($isMoreError == TRUE)
-                return TRUE;
-            else
-                return FALSE;
-            break;
-
-        default:
-            break;
-    }
+    if ($isError[$type] == TRUE)
+        return TRUE;
+    else
+        return FALSE;
 }
 
 function doError($text, $type) {
-    /*
-     * Error types:
-     *  0 - Tip
-     *  1 - Warning - CURRENTLY_NOT_USED
-     *  2 - Fatal Error
-     *  3 - Warning: More info
-     */
-
+    global $isError;
     global $errorOutput;
-    global $tipOutput;
-    global $moreOutput;
-    global $isFatalError;
-    global $isWarningError;
-    global $isMoreError;
-    global $isTipError;
+
+    //Don't make two same errors
+    if ((isError($type) == TRUE) && (strpos($errorOutput[$type], $text) !== FALSE)) {
+        return;
+    }
 
     switch ($type) {
         case 0:
-            if ((isError(0) == TRUE) && (strpos($tipOutput, $text) !== FALSE)) {
-                //Do nothing.
-            } else {
-                $tipOutput .= "<li><span class=\"tip\">" . ERROR_TIP . " </span>" . $text . "</li>";
-                $isTipError = TRUE;
-            }
+            $errorOutput[$type] .= "<li><span class=\"tip\">" . ERROR_TIP . " </span>" . $text . "</li>";
             break;
 
         case 1:
-            //Don't make 2 same warnings.
-            if ((isError(1) == TRUE) && (strpos($errorOutput, $text) !== FALSE)) {
-                //Do nothing.
-            } else {
-                $errorOutput .= "<li><span class=\"error warning\">" . ERROR_WARNING . " </span>" . $text . "</li>";
-                $isWarningError = TRUE; //make other know that we got warning error over here!
-            }
+            $errorOutput[$type] .= "<li><span class=\"error warning\">" . ERROR_WARNING . " </span>" . $text . "</li>";
             break;
 
         case 2:
-            //Don't make 2 same errors.
-            if ((isError(2) == TRUE) && (strpos($errorOutput, $text) !== FALSE)) {
-                //Do nothing.
-            } else {
-                $errorOutput .="<li><span class=\"error fatal\">" . ERROR_FATAL . " </span>" . $text . "</li>";
-                $isFatalError = TRUE;
-            }
+            $errorOutput[$type] .= "<li><span class=\"error fatal\">" . ERROR_FATAL . " </span>" . $text . "</li>";
             break;
 
         case 3:
-            //Don't make 2 same errors.
-            if ((isError(3) == TRUE) && (strpos($moreOutput, $text) !== FALSE)) {
-                //Do nothing.
-            } else {
-                $moreOutput .="<li>" . $text . "</li>";
-                $isMoreError = TRUE;
-            }
+            $errorOutput[$type] .= "<li>" . $text . "</li>";
             break;
 
         default:
             die("Unhandled exception #1A." . ERROR_UNHANDLED);
             break;
     }
+    $isError[$type] = TRUE;
 }
 
 function showError() {
     global $errorOutput;
-    global $tipOutput;
-    global $moreOutput;
-
     $return = "";
 
     if (isError(2) == TRUE) {
-        $return = "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>\n";
+        $return = "<div id=\"error\"><ul>" . $errorOutput[2] . "</ul></div>\n";
     } elseif (isError(1) == TRUE) {
-        $return .= "<div id=\"error\"><ul>" . $errorOutput . "</ul></div>\n";
+        $return = "<div id=\"error\"><ul>" . $errorOutput[1] . "</ul></div>\n";
         if (isError(3) == TRUE)
-            $return .= "<div id=\"moreinfo\" class=\"hidden\"><ul>" . $moreOutput . "</ul><span class=\"hide\" onclick=\"changeVisibility('moreinfo')\">(Skrýt)</span></div>\n";
+            $return .= "<div id=\"moreinfo\" class=\"hidden\"><ul>" . $errorOutput[3] . "</ul><a href=\"#\" class=\"hide\" onclick=\"changeVisibility('moreinfo')\">(Skrýt)</a></div>\n";
     }
 
     if (isError(0) == TRUE)
-        $return .= "<div id=\"tip\"><ul>" . $tipOutput . "</ul></div>\n";
+        $return .= "<div id=\"tip\"><ul>" . $errorOutput[0] . "</ul></div>\n";
 
     return $return;
 }
@@ -182,7 +122,7 @@ function morseCode($input, $encode) {
     global $morse_buffer;
     $return = NULL;
     $i = 0;
-
+    
     if ($encode == TRUE) {
         //MORSECODE ENCODE
         $input = diacriticFree($input);
@@ -190,7 +130,7 @@ function morseCode($input, $encode) {
 
         $getCh = strpos($input, "ch");  //do this before the string is splitted
         $input = str_split($input); //the only exception
-        //handling Ch character
+        //handling Ch character, skip if ch not found
         if ($getCh !== FALSE) {
             for ($i = 0; $i < count($input) - 1; $i++) {
                 if (($input[$i] == "c") && ($input[$i + 1] == "h")) {
@@ -204,19 +144,16 @@ function morseCode($input, $encode) {
         unset($getCh);
 
         foreach ($input as $temp) {
+            $i = 0;
             //spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
             if (!array_key_exists($temp, $morse)) {
                 doError(ERROR_MORSE_T2M_INPUT, 1);
-                doError("<span class=\"red error\">Chyba je poblíž: </span>" . ($i + 1) . ". písmeno (<span class=\"red\">" . $temp . "</span>)", 3);
-                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . ($i + 1) . "'>*</span>";
+                doError("<span class=\"error\">" . ERROR_INPUT_ERROR_NEAR . "</span>" . ($i + 1) . ". písmeno (Neznámý znak <span class=\"red\">" . $temp . "</span>)", 3);
                 doError(ERROR_MORSE_TIP_LIST, 0);
-
-                if (($i + 1) != count($input)) {
-                    $return .= " / ";
-                }
-            } elseif ($morse[$temp] == "/") {
-                $return.= "/ ";
-                $return = str_replace(" / / ", " // ", $return);
+                $return .= "<span class=\"red error\" title = '" . ERROR_INPUT_ERROR_NEAR . ($i + 1) . ". písmeno'>*</span> / ";
+            } elseif ($temp == " ") {
+                $return .= "/ ";
+                $return = str_replace("/ /", "// ", $return); //formatting, easier than if next char is space do this....
             } else {
                 $return.= $morse[$temp] . " / ";
             }
@@ -237,10 +174,10 @@ function morseCode($input, $encode) {
             if ($temp == "") {
                 $return .= " ";
             } elseif ((!in_array($temp, $morse))) {
-                $return .= "<span class=\"red error\" title = 'Chyba je pobliz: " . ($i + 1) . ". pismeno'>*</span>";
                 doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
-                doError("<span class=\"red error\">Chyba je poblíž: </span>" . ($i + 1) . ". písmeno: (<span class=\"red\">" . $temp . "</span>)", 3);
+                doError("<span class=\"error\">" . ERROR_INPUT_ERROR_NEAR . "</span>" . ($i + 1) . ". písmeno: (Neznámý vstup: <span class=\"red\">" . $temp . "</span>)", 3);
                 doError(ERROR_MORSE_TIP_LIST, 0);
+                $return .= "<span class=\"red error\" title = '" . ERROR_INPUT_ERROR_NEAR . " " . ($i + 1) . ". pismeno'>*</span>";
             } elseif (in_array($temp, $morse)) {
                 $return.= array_search($temp, $morse);
             }
@@ -259,7 +196,7 @@ function showOutput($input) {
         //if we use latin1, it is converted - so it counts as two
         if (mb_strlen($input, 'latin1') > $config['input_length']) {
             $lengthDiff = ((mb_strlen($input, 'latin1')) - $config['input_length']);
-            
+
             if ($lengthDiff < 1024) {
                 $lengthDiff .= " bytes";
             } elseif (($rozdil > 1024) && ($lengthDiff < 1048576)) {
@@ -267,7 +204,7 @@ function showOutput($input) {
             } else {
                 $lengthDiff = round($lengthDiff / 1024 / 1024) . " megabytes";
             }
-            
+
             doError(ERROR_INPUT_SIZE_EXCEEDED . "o " . $lengthDiff, 2);
         }
     }
@@ -275,15 +212,13 @@ function showOutput($input) {
     //Trim some characters like:
     $input = trim($input); //whitespaces at start and end
     $input = str_replace(array("\r\n", "\r", "\n"), ' ', $input); // newlines
-
-    //we don't want to continue if we have already fatal error or when no input (todo: check by javascript in form)
-    if (isError(2) == TRUE)
-        return;
     
+    //we don't want to continue if no input or fatal error already
     if ($input == NULL) {
         doError(ERROR_INPUT_EMPTY, 2);
-        return;
     }
+    if (isError(2) == TRUE)
+        return;
 
     //MORSECODE
     //if something goes wrong, just make an error during t2m/m2t
