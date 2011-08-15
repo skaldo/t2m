@@ -14,7 +14,7 @@ $config['input_length'] = "1048576"; //1M - that is about 850k chars in czech (r
  * Config end
  */
 
-include "define.php";
+require_once "define.php";
 
 $isError = array(
     0 => FALSE, // Tip
@@ -38,9 +38,13 @@ define("ERROR_MORE_ERROR_NEAR", "Chyba je poblíž: ", TRUE);
 define("ERROR_INPUT_SIZE_EXCEEDED", "Překročili jste maximální velikost vstupu ", TRUE);
 define("ERROR_INPUT_EMPTY", "Nezapomněli jste na něco?", TRUE);
 define("ERROR_UNHANDLED", "Please remember what you were doint and contact administrator<br />To continue reload page or press F5.", TRUE);
+
 define("ERROR_MORSE_T2M_INPUT", "Vstup je pro morseovu abecedu neplatný. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
 define("ERROR_MORSE_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
-define("ERROR_MORSE_TIP_LIST", "Máte problémy s Morseovou abecedou? Podívejte se na <a href=\"help.html\" onclick=\"return popup('help.html')\">seznam znaků</a>!</span>", TRUE);
+define("ERROR_MORSE_TIP_LIST", "Máte problémy s Morseovou abecedou? Podívejte se na <a href=\"help.php?type=mo\" onclick=\"return popup('help.php?type=mo')\">seznam znaků</a>!</span>", TRUE);
+
+define("ERROR_BINARY_UNRECOGNIZED", "Neplatný vstup.", TRUE);
+define("ERROR_BINARY_TIP_LIST", "Máte problémy se vstupem? Podívejte se na <a href=\"help.php?type=bi\" onclick=\"return popup('help.php?type=bi')\">seznam znaků</a>!</span>", TRUE);
 
 function diacriticFree($text) {
     $array = Array('ä' => 'a', 'Ä' => 'A', 'á' => 'a', 'Á' => 'A', 'à' => 'a', 'À' => 'A', 'ã' => 'a', 'Ã' => 'A', 'â' => 'a', 'Â' => 'A', 'č' => 'c', 'Č' => 'C', 'ć' => 'c', 'Ć' => 'C', 'ď' => 'd', 'Ď' => 'D', 'ě' => 'e', 'Ě' => 'E', 'é' => 'e', 'É' => 'E', 'ë' => 'e', 'Ë' => 'E', 'è' => 'e', 'È' => 'E', 'ê' => 'e', 'Ê' => 'E', 'í' => 'i', 'Í' => 'I', 'ï' => 'i', 'Ï' => 'I', 'ì' => 'i', 'Ì' => 'I', 'î' => 'i', 'Î' => 'I', 'ľ' => 'l', 'Ľ' => 'L', 'ĺ' => 'l', 'Ĺ' => 'L', 'ń' => 'n', 'Ń' => 'N', 'ň' => 'n', 'Ň' => 'N', 'ñ' => 'n', 'Ñ' => 'N', 'ó' => 'o', 'Ó' => 'O', 'ö' => 'o', 'Ö' => 'O', 'ô' => 'o', 'Ô' => 'O', 'ò' => 'o', 'Ò' => 'O', 'õ' => 'o', 'Õ' => 'O', 'ő' => 'o', 'Ő' => 'O', 'ř' => 'r', 'Ř' => 'R', 'ŕ' => 'r', 'Ŕ' => 'R', 'š' => 's', 'Š' => 'S', 'ś' => 's', 'Ś' => 'S', 'ť' => 't', 'Ť' => 'T', 'ú' => 'u', 'Ú' => 'U', 'ů' => 'u', 'Ů' => 'U', 'ü' => 'u', 'Ü' => 'U', 'ù' => 'u', 'Ù' => 'U', 'ũ' => 'u', 'Ũ' => 'U', 'û' => 'u', 'Û' => 'U', 'ý' => 'y', 'Ý' => 'Y', 'ž' => 'z', 'Ž' => 'Z', 'ź' => 'z', 'Ź' => 'Z');
@@ -119,7 +123,6 @@ function morseCode($input, $encode) {
     //text = input text ; encode==TRUE =>text2morse, FALSE=>morse2text
 
     global $morse;
-    global $morse_buffer;
     $return = NULL;
     $i = 0;
 
@@ -159,7 +162,7 @@ function morseCode($input, $encode) {
             }
             $i++;
         }
-    } else {
+    } elseif ($encode == FALSE) {
 
         //MORSECODE DECODE, input check is handled in showOutput()
         if (strpos($input, "/") === FALSE)
@@ -180,11 +183,65 @@ function morseCode($input, $encode) {
             }
             $i++;
         }
+    } else {
+        die("unahdled"); //TODO: UNHANDLED
     }
+
     return $return;
 }
 
-function showOutput($input) {
+function binaryCode($input, $encode) {
+    global $binary;
+    $return = NULL;
+    $i = 0;
+
+    if ($encode == TRUE) {
+
+        //$input = diacriticFree($input);
+        $input = preg_replace('!\s+!', ' ', $input); //multiple spaces into one space
+        $input = str_split($input);
+
+        foreach ($input as $temp) {
+            if (!array_key_exists($temp, $binary)) {
+                //TODO: MOREINFO
+                doError(ERROR_BINARY_UNRECOGNIZED, 1);
+                doError(ERROR_BINARY_TIP_LIST, 0);
+                $return .= "<span class=\"red\">ERR</span> ";
+            } else {
+                $return.= $binary[$temp] . " ";
+            }
+            $i++;
+        }
+    } elseif ($encode == FALSE) {
+
+        if (preg_match("/\\s/", $input))
+            $input = explode(" ", $input);     // split by space
+        else {
+            $temp = $input;
+            $input = array();
+            for ($j = 0; $j < strlen($temp); $j += 8)
+                $input[] = substr($temp, $j, 8);
+        }
+        //Binary DECODE, input check is handled in showOutput()
+        foreach ($input as $temp) {
+            if ((!in_array($temp, $binary))) {
+                //TODO: MOREINFO
+                doError(ERROR_BINARY_UNRECOGNIZED, 1);
+                doError(ERROR_BINARY_TIP_LIST, 0);
+                $return .= "<span class=\"red\">ERR</span> ";
+            } else {
+                $return.= array_search($temp, $binary);
+            }
+            $i++;
+        }
+    } else {
+        die("Unhandled"); //TODO: Unhandled
+    }
+
+    return $return;
+}
+
+function showOutput($input, $type) {
     $return = NULL;
     global $config;
 
@@ -216,15 +273,31 @@ function showOutput($input) {
     if (isError(2) == TRUE)
         return;
 
-    //MORSECODE
-    //if something goes wrong, just make an error during t2m/m2t
-    //check for the only chars available in MorseCode (.-/) + \r\n (newline)
-    if (preg_match('/^[\ \-\.\/\n\r]+$/i', $input)) {
-        $return = morseCode($input, FALSE);
-    } else {
-        $return = morseCode($input, TRUE);
-    }
+    switch ($type) {
+        case "mo":
+            //MORSECODE
+            //check for the only chars available in MorseCode (.-/) + \r\n (newline)
+            if (preg_match('/^[\ \-\.\/\n\r]+$/i', $input)) {
+                $return = morseCode($input, FALSE);
+            } else {
+                $return = morseCode($input, TRUE);
+            }
+            break;
 
+        case "bi":
+            //BINARY
+            //check for the only chars available in binary (01\s)
+            if (preg_match('/^[01\ ]+$/i', $input)) {
+                $return = binaryCode($input, FALSE);
+            } else {
+                $return = binaryCode($input, TRUE);
+            }
+            break;
+
+        default:
+            die("Unhandled"); //TODO: UNHANDLED
+            break;
+    }
     return $return;
 }
 

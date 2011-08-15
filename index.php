@@ -35,7 +35,7 @@ require_once "include.php";
         <script language="javascript" type="text/javascript">
             <!--
             function popup(url) {
-                newwindow=window.open(url,'name','height=500,width=370px');
+                newwindow=window.open(url,'name','height=500,width=600px');
                 if (window.focus) {newwindow.focus()}
                 return false;
             }
@@ -51,16 +51,38 @@ require_once "include.php";
         <div id="wrapper">
             <div id="left">
                 <form action="index.php" method="POST">
-                    <span class="form">Morseovka - kódování i dekódování:</span>
-                    <textarea rows="6" cols="40" name="input"><?php if(isset($_POST['input'])) echo $_POST['input']; ?></textarea>
+                    <select name="type">
+                        <?php
+                        if (isset($_POST['type'])) {
+                            switch ($_POST['type']) {
+                                case "mo":
+                                    echo "<option value=\"mo\" selected>Text2Morse</option>";
+                                    echo "<option value=\"bi\">Text2Binary</option>";
+                                    break;
+                                
+                                case "bi":
+                                    echo "<option value=\"mo\">Text2Morse</option>";
+                                    echo "<option value=\"bi\" selected>Text2Binary</option>";
+                                    break;
+                                
+                                default:
+                                    echo "<option value=\"mo\">Text2Morse</option>";
+                                    echo "<option value=\"bi\">Text2Binary</option>";
+                                    break;
+                            }
+                        }
+                        ?>
+                    </select>
+                    <textarea rows="6" cols="40" name="input"><?php if (isset($_POST['input']))
+                            echo $_POST['input']; ?></textarea>
                     <input type="submit" value="převést" name="ok" class="submit">
                 </form>
             </div>
 
             <div id="right">
                 <?php
-                if (isset($_POST['input'])) {
-                    $output = showOutput($_POST['input']);
+                if ((isset($_POST['input'])) && (isset($_POST['type']))) {
+                    $output = showOutput($_POST['input'], $_POST['type']);
 
                     echo showError();
 
