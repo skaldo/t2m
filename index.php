@@ -9,10 +9,12 @@ $starttime = $mtime;
  * TODO:
  * H: Still better error handling - too much code and variables
  * H: Better error position show - prev. two and next two chars.
+ *      - error position for Binary
  * H: Code cleanup
  * 
  * M: Better UI
  * M: Variables rename
+ * M: Unhandled errors.
  * 
  * L: SEO optimize? - discussion: be a script or web page/script
  * L: javascript check for no form input
@@ -59,22 +61,24 @@ require_once "include.php";
                                     echo "<option value=\"mo\" selected>Text2Morse</option>";
                                     echo "<option value=\"bi\">Text2Binary</option>";
                                     break;
-                                
+
                                 case "bi":
                                     echo "<option value=\"mo\">Text2Morse</option>";
                                     echo "<option value=\"bi\" selected>Text2Binary</option>";
                                     break;
-                                
+
                                 default:
-                                    echo "<option value=\"mo\">Text2Morse</option>";
-                                    echo "<option value=\"bi\">Text2Binary</option>";
                                     break;
                             }
+                        } else {
+                            echo "<option value=\"mo\">Text2Morse</option>";
+                            echo "<option value=\"bi\">Text2Binary</option>";
                         }
                         ?>
                     </select>
-                    <textarea rows="6" cols="40" name="input"><?php if (isset($_POST['input']))
-                            echo $_POST['input']; ?></textarea>
+
+                    <textarea rows="6" cols="40" name="input"><?php if (isset($_POST['input'])) echo $_POST['input']; ?></textarea>
+
                     <input type="submit" value="převést" name="ok" class="submit">
                 </form>
             </div>

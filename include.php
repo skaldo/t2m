@@ -197,7 +197,7 @@ function binaryCode($input, $encode) {
 
     if ($encode == TRUE) {
 
-        //$input = diacriticFree($input);
+        $input = diacriticFree($input);
         $input = preg_replace('!\s+!', ' ', $input); //multiple spaces into one space
         $input = str_split($input);
 
