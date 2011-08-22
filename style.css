@@ -26,6 +26,7 @@ ul{
     padding: 1em;
     float:left;
     max-width: 650px;
+    word-break:break-word;
 }
 
 #error{

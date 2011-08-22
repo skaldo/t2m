@@ -35,7 +35,6 @@ require_once "include.php";
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>T2M</title>
         <script language="javascript" type="text/javascript">
-            <!--
             function popup(url) {
                 newwindow=window.open(url,'name','height=500,width=600px');
                 if (window.focus) {newwindow.focus()}
@@ -46,7 +45,7 @@ require_once "include.php";
                 el=document.getElementById(id).style; 
                 el.display=(el.display == 'block')?'none':'block';
             }
-            // -->
+          
         </script>
     </head>
     <body>
@@ -77,10 +76,16 @@ require_once "include.php";
                         ?>
                     </select>
 
-                    <textarea rows="6" cols="40" name="input"><?php if (isset($_POST['input'])) echo $_POST['input']; ?></textarea>
+                    <textarea rows="6" cols="40" name="input"><?php if (isset($_POST['input']))
+                            echo $_POST['input']; ?></textarea>
 
                     <input type="submit" value="převést" name="ok" class="submit">
                 </form>
+                <?php
+                if ((isset($_POST['type'])) && ($_POST['type'] == 'bi'))
+                    echo "<a href=\"#\" onclick=\"smazMezeryDiv();\">Vystup bez mezer</a>";
+                ?>
+
             </div>
 
             <div id="right">
@@ -96,6 +101,7 @@ require_once "include.php";
                 }
                 ?>
             </div>
+
         </div>
         <div class="cleaner"></div>
         <div id="info_bubble">
@@ -109,6 +115,23 @@ require_once "include.php";
             <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
         </div>
     </body>
+    <script language="javascript" type="text/javascript">
+        /* smazMezeryDiv */
+        var element = document.getElementById("right");
+        var string = element.innerHTML;
+        var spacesFree = string.split(' ').join('');
+        function smazMezeryDiv(vrat) {
+                
+            var status = "unshorted";
+
+            if (right.innerHTML == spacesFree) {
+                right.innerHTML = string;
+            }
+ 
+            else if (right.innerHTML == string) {
+                right.innerHTML = spacesFree;
+            }
+        }</script>
 </html>
 
 <?php
