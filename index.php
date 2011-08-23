@@ -11,19 +11,17 @@ $starttime = $mtime;
  * H: Better error position show - prev. two and next two chars.
  *      - error position for Binary
  * H: Code cleanup
+ * H: Locales - make everything into defines or something like this. Now we have some of them in defs, others are hardcoded
  * 
  * M: Better UI
- * M: Variables rename
  * M: Unhandled errors.
+ * M: Copy to clipboard
  * 
- * L: SEO optimize? - discussion: be a script or web page/script
- * L: javascript check for no form input
- *
  * F: sentence divider?
- * F: Add check button for Ch letter -> only for slavonic languages
  * F: input only numbers - make them short? (wiki)
  * F: Add more encode/decode
  *      * base64() encode decode?
+ * F: API
  */
 
 require_once "include.php";
@@ -45,7 +43,7 @@ require_once "include.php";
                 el=document.getElementById(id).style; 
                 el.display=(el.display == 'block')?'none':'block';
             }
-          
+            
         </script>
     </head>
     <body>
@@ -81,10 +79,30 @@ require_once "include.php";
 
                     <input type="submit" value="převést" name="ok" class="submit">
                 </form>
+
                 <?php
-                if ((isset($_POST['type'])) && ($_POST['type'] == 'bi'))
-                    echo "<a href=\"#\" onclick=\"smazMezeryDiv();\">Vystup bez mezer</a>";
+                if (isset($_POST['type'])) {
+                    echo "<div id=\"options\">";
+
+                    switch ($_POST['type']) {
+                        case 'mo':
+                            echo "Placeholder";
+                            break;
+
+                        case 'bi':
+                            echo "<a href=\"#\" onclick=\"smazMezeryDiv();\">Vystup bez mezer</a>";
+                            break;
+
+                        default:
+                            break;
+                    }
+                    echo "</div>";
+                }
                 ?>
+
+                <div id="info">
+                    Contact me by <b>twitter:</b> @evandar or by <b>xmpp:</b> evandar@jabber.cz
+                </div>
 
             </div>
 
@@ -104,17 +122,9 @@ require_once "include.php";
 
         </div>
         <div class="cleaner"></div>
-        <div id="info_bubble">
-            Dekódování morseovky: <i>2 možné vstupy</i><br>
-            <ul type="square">
-                <li><b>1) </b>písmena se oddělují mezerou, slova více mezerami</li>
-                <li><b>2) </b>písmena se oddělují lomítkem, slova více lomítky (/)</li>
-                <li><b>3) </b>tyto dva způsoby nelze směšovat!</li>
-                <li></li>    
-            </ul>
-            <span style="font-size:.7em;">evandar.cz 2011, evandar *at* evandar *dot* cz, xmpp: evandar@jabber.cz</span>
-        </div>
+
     </body>
+
     <script language="javascript" type="text/javascript">
         /* smazMezeryDiv */
         var element = document.getElementById("right");
@@ -122,8 +132,6 @@ require_once "include.php";
         var spacesFree = string.split(' ').join('');
         function smazMezeryDiv(vrat) {
                 
-            var status = "unshorted";
-
             if (right.innerHTML == spacesFree) {
                 right.innerHTML = string;
             }
@@ -132,6 +140,7 @@ require_once "include.php";
                 right.innerHTML = spacesFree;
             }
         }</script>
+
 </html>
 
 <?php

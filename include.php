@@ -4,11 +4,18 @@
  * ***********
  * * Config **
  * ***********
- * input_length:  - max length of input string. If empty, post_max_size in php.ini is used. In bytes.
+ * input_length:    - max length of input string. If empty, post_max_size in php.ini is used. In bytes.
+ *                  - 524288 recommended - 500K
+ *                  - no quotes.
+ * handle_ch:       - Should we handle Ch diagraph? Boolean.
+ *                  - set TRUE for Chamorro, Czech, Slovak, Polish, Igbo, Quechua, Guarani, Welsh, Cornish, Breton and Belarusian Łacinka
  * 
  */
 
-$config['input_length'] = "1048576"; //1M - that is about 850k chars in czech (really? :) )
+$config = array(
+    'input_length' => 524288, //Do not escape by quotes. TODO: Make this safe.
+    'handle_ch' => TRUE,
+);
 
 /*
  * Config end
@@ -45,6 +52,27 @@ define("ERROR_MORSE_TIP_LIST", "Máte problémy s Morseovou abecedou? Podívejte
 
 define("ERROR_BINARY_UNRECOGNIZED", "Neplatný vstup.", TRUE);
 define("ERROR_BINARY_TIP_LIST", "Máte problémy se vstupem? Podívejte se na <a href=\"help.php?type=bi\" onclick=\"return popup('help.php?type=bi')\">seznam znaků</a>!</span>", TRUE);
+
+function validateConfig() {
+    global $config;
+    
+    if (
+            (!isset($config)) ||
+            (!is_array($config)) ||
+            (!array_key_exists('input_length', $config)) ||
+            (!array_key_exists('handle_ch', $config))
+    ) {
+        doError('Config broken. Shutting down. #1', 2);
+    }
+
+    if (!is_bool($config['handle_ch']) === TRUE) {
+        doError('Config broken. Shutting down. #2', 2);
+    }
+    
+    if (!is_int($config['input_length'])) {
+        doError('Config broken. Shutting down. #3', 2);
+    }
+}
 
 function diacriticFree($text) {
     $array = Array('ä' => 'a', 'Ä' => 'A', 'á' => 'a', 'Á' => 'A', 'à' => 'a', 'À' => 'A', 'ã' => 'a', 'Ã' => 'A', 'â' => 'a', 'Â' => 'A', 'č' => 'c', 'Č' => 'C', 'ć' => 'c', 'Ć' => 'C', 'ď' => 'd', 'Ď' => 'D', 'ě' => 'e', 'Ě' => 'E', 'é' => 'e', 'É' => 'E', 'ë' => 'e', 'Ë' => 'E', 'è' => 'e', 'È' => 'E', 'ê' => 'e', 'Ê' => 'E', 'í' => 'i', 'Í' => 'I', 'ï' => 'i', 'Ï' => 'I', 'ì' => 'i', 'Ì' => 'I', 'î' => 'i', 'Î' => 'I', 'ľ' => 'l', 'Ľ' => 'L', 'ĺ' => 'l', 'Ĺ' => 'L', 'ń' => 'n', 'Ń' => 'N', 'ň' => 'n', 'Ň' => 'N', 'ñ' => 'n', 'Ñ' => 'N', 'ó' => 'o', 'Ó' => 'O', 'ö' => 'o', 'Ö' => 'O', 'ô' => 'o', 'Ô' => 'O', 'ò' => 'o', 'Ò' => 'O', 'õ' => 'o', 'Õ' => 'O', 'ő' => 'o', 'Ő' => 'O', 'ř' => 'r', 'Ř' => 'R', 'ŕ' => 'r', 'Ŕ' => 'R', 'š' => 's', 'Š' => 'S', 'ś' => 's', 'Ś' => 'S', 'ť' => 't', 'Ť' => 'T', 'ú' => 'u', 'Ú' => 'U', 'ů' => 'u', 'Ů' => 'U', 'ü' => 'u', 'Ü' => 'U', 'ù' => 'u', 'Ù' => 'U', 'ũ' => 'u', 'Ũ' => 'U', 'û' => 'u', 'Û' => 'U', 'ý' => 'y', 'Ý' => 'Y', 'ž' => 'z', 'Ž' => 'Z', 'ź' => 'z', 'Ź' => 'Z');
@@ -123,6 +151,7 @@ function morseCode($input, $encode) {
     //text = input text ; encode==TRUE =>text2morse, FALSE=>morse2text
 
     global $morse;
+    global $config;
     $return = NULL;
     $i = 0;
 
@@ -135,7 +164,7 @@ function morseCode($input, $encode) {
         $getCh = strpos($input, "ch");  //do this before the string is splitted
         $input = str_split($input);
         //handling Ch character, skip if ch not found
-        if ($getCh !== FALSE) {
+        if (($getCh !== FALSE) && ($config['handle_ch'] == TRUE)) {
             for ($j = 0; $j < count($input) - 1; $j++) {
                 if (($input[$j] == "c") && ($input[$j + 1] == "h")) {
                     $input[$j] = "ch";
@@ -163,7 +192,6 @@ function morseCode($input, $encode) {
             $i++;
         }
     } elseif ($encode == FALSE) {
-
         //MORSECODE DECODE, input check is handled in showOutput()
         if (strpos($input, "/") === FALSE)
             $input = explode(" ", $input);            // split by space
@@ -244,8 +272,10 @@ function binaryCode($input, $encode) {
 function showOutput($input, $type) {
     $return = NULL;
     global $config;
-
-    if ((isset($config['input_length'])) && ($config['input_length'] != "")) {
+    
+    validateConfig();
+    
+    if ($config['input_length'] != "") {
         //in utf8 "č" is 2 bytes long, but it counts as one
         //if we use latin1, it is converted - so it counts as two
         if (mb_strlen($input, 'latin1') > $config['input_length']) {

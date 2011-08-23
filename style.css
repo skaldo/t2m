@@ -22,11 +22,13 @@ ul{
 }
 
 #right{
-    margin: 1em 0 0 2em;
+    margin: 2em 0 0 2em;
     padding: 1em;
     float:left;
     max-width: 650px;
     word-break:break-word;
+    max-height: 70%;
+    overflow: auto;
 }
 
 #error{
@@ -70,21 +72,6 @@ ul{
     letter-spacing: .1em;
 }
 
-#info_bubble{
-    text-align:left;
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 20px;
-    border: 1.5px solid black;
-    margin-top: 70px;
-    margin-left: 10%;
-    padding: .5em;
-    width:45%;
-    -webkit-box-shadow: 10px 10px 10px 0px gray;
-    -moz-box-shadow: 10px 10px 10px 0px gray;
-    box-shadow: 10px 10px 10px 0px gray;
-}
-
 .form {font-size:.8em;}
 .error {font-weight:bold;}
 .tip {font-weight:bold;}
@@ -96,6 +83,22 @@ ul{
 .hide {
     text-align: right; /* why this does not work? */
     font-size:.7em;
+}
+
+#options{
+    margin-top: 5em;
+    padding-top: 1em;
+    text-align: left;
+    font-size: .7em;
+    border-top: 1px solid black;
+}
+
+#info{
+    margin-top: 5em;
+    padding-top: 1em;
+    text-align: left;
+    font-size: .7em;
+    border-top: 1px solid black;
 }
 
 .cleaner {
