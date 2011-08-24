@@ -1,9 +1,12 @@
 ﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <?php
-$mtime = microtime();
-$mtime = explode(" ", $mtime);
-$mtime = $mtime[1] + $mtime[0];
-$starttime = $mtime;
+require_once "config.php";
+if (($config['show_gen_time']) == TRUE) {
+    $mtime = microtime();
+    $mtime = explode(" ", $mtime);
+    $mtime = $mtime[1] + $mtime[0];
+    $starttime = $mtime;
+}
 
 /*
  * TODO:
@@ -144,11 +147,12 @@ require_once "include.php";
 </html>
 
 <?php
-$mtime = microtime();
-$mtime = explode(" ", $mtime);
-$mtime = $mtime[1] + $mtime[0];
-$endtime = $mtime;
-$totaltime = ($endtime - $starttime) * 1000;
-//Uncoment this for execution time:
-//echo "This page was created in " . $totaltime . " ms";
+if (($config['show_gen_time']) == TRUE) {
+    $mtime = microtime();
+    $mtime = explode(" ", $mtime);
+    $mtime = $mtime[1] + $mtime[0];
+    $endtime = $mtime;
+    $totaltime = ($endtime - $starttime) * 1000;
+    echo "This page was generated in " . $totaltime . " ms";
+}
 ?>

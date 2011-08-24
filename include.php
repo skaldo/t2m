@@ -1,26 +1,5 @@
 <?php
 
-/*
- * ***********
- * * Config **
- * ***********
- * input_length:    - max length of input string. If empty, post_max_size in php.ini is used. In bytes.
- *                  - 524288 recommended - 500K
- *                  - no quotes.
- * handle_ch:       - Should we handle Ch diagraph? Boolean.
- *                  - set TRUE for Chamorro, Czech, Slovak, Polish, Igbo, Quechua, Guarani, Welsh, Cornish, Breton and Belarusian Łacinka
- * 
- */
-
-$config = array(
-    'input_length' => 524288, //Do not escape by quotes. TODO: Make this safe.
-    'handle_ch' => TRUE,
-);
-
-/*
- * Config end
- */
-
 require_once "define.php";
 
 $isError = array(
@@ -70,6 +49,10 @@ function validateConfig() {
     }
 
     if (!is_int($config['input_length'])) {
+        doError(2, "Config broken. Shutting down. #3");
+    }
+
+    if (!is_bool($config['show_gen_time'])) {
         doError(2, "Config broken. Shutting down. #3");
     }
 }
@@ -137,17 +120,16 @@ function doError($type, $text, $more=NULL) {
     }
 
 
-        $isError[$type] = TRUE;
+    $isError[$type] = TRUE;
 
     if ($more != NULL) {
         $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text;
         $errorOutput[$type] .= " <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>";
         $errorOutput[$type] .= "</li>";
-        
+
         $errorOutput[3] = "<li><span class=\"bold\">" . ERROR_MORE_ERROR_NEAR . " </span>" . $more . "</li>";
         $isError[3] = TRUE;
-    }
-    else {
+    } else {
         $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text . "</li>";
     }
 }
@@ -221,13 +203,12 @@ function morseCode($input, $encode) {
         }
     } elseif ($encode == FALSE) {
         //MORSECODE DECODE, input check is handled in showOutput()
-//        if (strpos($input, "/") === FALSE)
-//            $input = explode(" ", $input);            // split by space
-//     else {
-        $input = str_replace(" ", "", $input);    //get rid of all spaces
-        $input = str_replace(" ", "", $input);    //get rid of all spaces
-        $input = explode("/", $input);            //and split by /
-//        }
+        if (strpos($input, "/") === FALSE)
+            $input = explode(" ", $input);            // split by space
+        else {
+            $input = str_replace(" ", "", $input);    //get rid of all spaces
+            $input = explode("/", $input);            //and split by /
+        }
 
         foreach ($input as $temp) {
             if ((!in_array($temp, $morse))) {
@@ -329,7 +310,7 @@ function showOutput($input, $type) {
             break;
 
         case "bi":
-            //check for the only chars available in binary (01\s)
+            //check for the only chars available in binary (0, 1 and \s )
             if (preg_match('/^[01\ ]+$/i', $input)) {
                 $return = binaryCode($input, FALSE);
             } else {
