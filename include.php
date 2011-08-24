@@ -27,14 +27,13 @@ $isError = array(
     0 => FALSE, // Tip
     1 => FALSE, // Warning
     2 => FALSE, // Fatal
-    3 => FALSE  // show more details, req warning (1) to work
+    3 => FALSE, // MoreInfo
 );
 
 $errorOutput = array(
     0 => "", // Tip
     1 => "", // Warn
     2 => "", // Fatal
-    3 => ""  // show more details, req warning (1) to work
 );
 
 //DEFINE ERRORS
@@ -62,15 +61,15 @@ function validateConfig() {
             (!array_key_exists('input_length', $config)) ||
             (!array_key_exists('handle_ch', $config))
     ) {
-        doError('Config broken. Shutting down. #1', 2);
+        doError(2, 'Config broken. Shutting down. #1');
     }
 
     if (!is_bool($config['handle_ch'])) {
-        doError('Config broken. Shutting down. #2', 2);
+        doError(2, 'Config broken. Shutting down. #2');
     }
 
     if (!is_int($config['input_length'])) {
-        doError('Config broken. Shutting down. #3', 2);
+        doError(2, 'Config broken. Shutting down. #3');
     }
 }
 
@@ -110,7 +109,8 @@ function isError($type) {
         return FALSE;
 }
 
-function doError($text, $type) {
+//Third argument is optional
+function doError($type, $text, $more=NULL) {
     global $isError;
     global $errorOutput;
 
@@ -129,17 +129,20 @@ function doError($text, $type) {
         case 2:
             $temp = ERROR_FATAL;
             break;
-        case 3:
-            $temp = ERROR_MORE_ERROR_NEAR;
-            break;
-        
+
         default:
             die("Unhandled exception #1A." . ERROR_UNHANDLED);
             break;
     }
-    
+
+
     $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text . "</li>";
     $isError[$type] = TRUE;
+
+    if ($more != NULL) {
+        $errorOutput[3] = "<li><span class=\"bold\">" . ERROR_MORE_ERROR_NEAR . " </span>" . $more . "</li>";
+        $isError[3] = TRUE;
+    }
 }
 
 function showError() {
@@ -149,11 +152,10 @@ function showError() {
     if ((isError(2) == TRUE) || (isError(1) == TRUE)) {
         $return = "<div id=\"error\"><ul>";
 
-        if (isError(2) == TRUE)
-            $return .= $errorOutput[2];
-
         if (isError(1) == TRUE)
             $return .= $errorOutput[1];
+        if (isError(2) == TRUE)
+            $return .= $errorOutput[2];
 
         $return .= "</ul></div>\n";
 
@@ -199,10 +201,9 @@ function morseCode($input, $encode) {
         foreach ($input as $temp) {
             //spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
             if (!array_key_exists($temp, $morse)) {
-                doError(ERROR_MORSE_T2M_INPUT, 1);
-                doError(($i + 1) . ". písmeno (Neznámý znak <span class=\"red\">" . $temp . "</span>)", 3);
-                doError(ERROR_MORSE_TIP_LIST, 0);
-                $return .= "<span class=\"red error\" title = '" . ERROR_MORE_ERROR_NEAR . ($i + 1) . ". písmeno (Neznámý znak: " . $temp . ")'>*</span> / ";
+                doError(1, ERROR_MORSE_T2M_INPUT, ($i + 1) . ". písmeno (Neznámý znak <span class=\"red\">" . $temp . "</span>)");
+                doError(0, ERROR_MORSE_TIP_LIST);
+                $return .= "<span class=\"red bold\" title = '" . ERROR_MORE_ERROR_NEAR . ($i + 1) . ". písmeno (Neznámý znak: " . $temp . ")'>*</span> / ";
             } elseif ($temp == " ") {
                 $return .= "/ ";
                 $return = str_replace("/ /", "//", $return); //formatting, easier than if next char is space do this....
@@ -222,10 +223,9 @@ function morseCode($input, $encode) {
 
         foreach ($input as $temp) {
             if ((!in_array($temp, $morse))) {
-                doError(ERROR_MORSE_M2T_UNRECOGNIZED, 1);
-                doError("<span class=\"error\">" . ERROR_MORE_ERROR_NEAR . "</span>" . ($i + 1) . ". písmeno: (Neznámý vstup: <span class=\"red\">" . $temp . "</span>)", 3);
-                doError(ERROR_MORSE_TIP_LIST, 0);
-                $return .= "<span class=\"red error\" title = '" . ERROR_MORE_ERROR_NEAR . " " . ($i + 1) . ". pismeno (Neznámý vstup: " . $temp . "'>*</span>";
+                doError(1, ERROR_MORSE_M2T_UNRECOGNIZED, "<span class=\"error\">" . ERROR_MORE_ERROR_NEAR . "</span>" . ($i + 1) . ". písmeno: (Neznámý vstup: <span class=\"red\">" . $temp . "</span>)");
+                doError(0, ERROR_MORSE_TIP_LIST, 0);
+                $return .= "<span class=\"red bold\" title = '" . ERROR_MORE_ERROR_NEAR . " " . ($i + 1) . ". pismeno (Neznámý vstup: " . $temp . "'>*</span>";
             } else {
                 $return.= array_search($temp, $morse);
             }
@@ -252,8 +252,8 @@ function binaryCode($input, $encode) {
         foreach ($input as $temp) {
             if (!array_key_exists($temp, $binary)) {
                 //TODO: MOREINFO
-                doError(ERROR_BINARY_UNRECOGNIZED, 1);
-                doError(ERROR_BINARY_TIP_LIST, 0);
+                doError(1, ERROR_BINARY_UNRECOGNIZED);
+                doError(0, ERROR_BINARY_TIP_LIST);
                 $return .= "<span class=\"red\">ERR</span> ";
             } else {
                 $return.= $binary[$temp] . " ";
@@ -275,8 +275,8 @@ function binaryCode($input, $encode) {
         foreach ($input as $temp) {
             if ((!in_array($temp, $binary))) {
                 //TODO: MOREINFO
-                doError(ERROR_BINARY_UNRECOGNIZED, 1);
-                doError(ERROR_BINARY_TIP_LIST, 0);
+                doError(0, ERROR_BINARY_UNRECOGNIZED);
+                doError(1, ERROR_BINARY_TIP_LIST);
                 $return .= "<span class=\"red\">ERR</span> ";
             } else {
                 $return.= array_search($temp, $binary);
@@ -298,7 +298,7 @@ function showOutput($input, $type) {
     checkInputLength($input);
 
     if ($input == NULL)
-        doError(ERROR_INPUT_EMPTY, 2);
+        doError(2, ERROR_INPUT_EMPTY);
 
     //Don't bother doing anything if already fatal error
     if (isError(2) == TRUE)
