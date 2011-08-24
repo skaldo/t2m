@@ -58,7 +58,7 @@ $morse = array(
         //" " => "/"
 );
 
-//DEFINE MORSE
+//DEFINE BINARY-ASCII CODE
 $binary = array(
 //    "Null" => "00000000",
 //    "Start of Heading" => "00000001",

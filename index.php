@@ -81,7 +81,7 @@ require_once "include.php";
                 </form>
 
                 <?php
-                if (isset($_POST['type'])) {
+                if ((isset($_POST['type'])) && ($_POST['input'] != NULL)) {
                     echo "<div id=\"options\">";
 
                     switch ($_POST['type']) {

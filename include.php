@@ -55,7 +55,7 @@ define("ERROR_BINARY_TIP_LIST", "Máte problémy se vstupem? Podívejte se na <a
 
 function validateConfig() {
     global $config;
-    
+
     if (
             (!isset($config)) ||
             (!is_array($config)) ||
@@ -65,12 +65,33 @@ function validateConfig() {
         doError('Config broken. Shutting down. #1', 2);
     }
 
-    if (!is_bool($config['handle_ch']) === TRUE) {
+    if (!is_bool($config['handle_ch'])) {
         doError('Config broken. Shutting down. #2', 2);
     }
-    
+
     if (!is_int($config['input_length'])) {
         doError('Config broken. Shutting down. #3', 2);
+    }
+}
+
+function checkInputLength($input) {
+    global $config;
+    if ($config['input_length'] != "") {
+        //in utf8 "č" is 2 bytes long, but it counts as one
+        //if we use latin1, it is converted - so it counts as two
+        if (mb_strlen($input, 'latin1') > $config['input_length']) {
+            $lengthDiff = ((mb_strlen($input, 'latin1')) - $config['input_length']);
+
+            if ($lengthDiff < 1024) {
+                $lengthDiff .= " bytes";
+            } elseif (($lengthDiff > 1024) && ($lengthDiff < 1048576)) {
+                $lengthDiff = round($lengthDiff / 1024) . " kilobytes";
+            } else {
+                $lengthDiff = round($lengthDiff / 1024 / 1024) . " megabytes";
+            }
+
+            doError(ERROR_INPUT_SIZE_EXCEEDED . "o " . $lengthDiff, 2);
+        }
     }
 }
 
@@ -133,10 +154,17 @@ function showError() {
     global $errorOutput;
     $return = "";
 
-    if (isError(2) == TRUE) {
-        $return = "<div id=\"error\"><ul>" . $errorOutput[2] . "</ul></div>\n";
-    } elseif (isError(1) == TRUE) {
-        $return = "<div id=\"error\"><ul>" . $errorOutput[1] . "</ul></div>\n";
+    if ((isError(2) == TRUE) || (isError(1) == TRUE)) {
+        $return = "<div id=\"error\"><ul>";
+
+        if (isError(2) == TRUE)
+            $return .= $errorOutput[2];
+
+        if (isError(1) == TRUE)
+            $return .= $errorOutput[1];
+
+        $return .= "</ul></div>\n";
+
         if (isError(3) == TRUE)
             $return .= "<div id=\"moreinfo\" class=\"hidden\"><ul>" . $errorOutput[3] . "</ul><a href=\"#\" class=\"hide\" onclick=\"changeVisibility('moreinfo')\">(Skrýt)</a></div>\n";
     }
@@ -241,16 +269,17 @@ function binaryCode($input, $encode) {
             $i++;
         }
     } elseif ($encode == FALSE) {
-
+        //Binary DECODE, input check is handled in showOutput()
+        // split by space or by 8 chars
         if (preg_match("/\\s/", $input))
-            $input = explode(" ", $input);     // split by space
+            $input = explode(" ", $input);
         else {
             $temp = $input;
             $input = array();
             for ($j = 0; $j < strlen($temp); $j += 8)
                 $input[] = substr($temp, $j, 8);
         }
-        //Binary DECODE, input check is handled in showOutput()
+
         foreach ($input as $temp) {
             if ((!in_array($temp, $binary))) {
                 //TODO: MOREINFO
@@ -272,40 +301,26 @@ function binaryCode($input, $encode) {
 function showOutput($input, $type) {
     $return = NULL;
     global $config;
-    
+
     validateConfig();
-    
-    if ($config['input_length'] != "") {
-        //in utf8 "č" is 2 bytes long, but it counts as one
-        //if we use latin1, it is converted - so it counts as two
-        if (mb_strlen($input, 'latin1') > $config['input_length']) {
-            $lengthDiff = ((mb_strlen($input, 'latin1')) - $config['input_length']);
+    checkInputLength($input);
 
-            if ($lengthDiff < 1024) {
-                $lengthDiff .= " bytes";
-            } elseif (($lengthDiff > 1024) && ($lengthDiff < 1048576)) {
-                $lengthDiff = round($lengthDiff / 1024) . " kilobytes";
-            } else {
-                $lengthDiff = round($lengthDiff / 1024 / 1024) . " megabytes";
-            }
-
-            doError(ERROR_INPUT_SIZE_EXCEEDED . "o " . $lengthDiff, 2);
-        }
-    }
-
-    //Trim some characters like:
-    $input = trim($input); //whitespaces at start and end
-    $input = str_replace(array("\r\n", "\r", "\n"), ' ', $input); // newlines
-    //we don't want to continue if no input or fatal error already
-    if ($input == NULL) {
+    if ($input == NULL)
         doError(ERROR_INPUT_EMPTY, 2);
-    }
+
     if (isError(2) == TRUE)
         return;
 
+    //Trim whitespaces at start/end and newlines
+    $input = trim($input);
+    $input = str_replace(array("\r\n", "\r", "\n"), ' ', $input);
+
     switch ($type) {
+        /*
+         * mo - text2morsecode
+         * bi - text2binary
+         */
         case "mo":
-            //MORSECODE
             //check for the only chars available in MorseCode (.-/) + \r\n (newline)
             if (preg_match('/^[\ \-\.\/\n\r]+$/i', $input)) {
                 $return = morseCode($input, FALSE);
@@ -315,7 +330,6 @@ function showOutput($input, $type) {
             break;
 
         case "bi":
-            //BINARY
             //check for the only chars available in binary (01\s)
             if (preg_match('/^[01\ ]+$/i', $input)) {
                 $return = binaryCode($input, FALSE);
