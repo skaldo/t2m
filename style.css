@@ -73,10 +73,7 @@ ul{
 }
 
 .form {font-size:.8em;}
-.error {font-weight:bold;}
-.tip {font-weight:bold;}
-.fatal {}
-.warning {}
+.bold {font-weight:bold;}
 .red {color:red;}
 .hidden {display: none;}
 

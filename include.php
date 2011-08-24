@@ -102,13 +102,6 @@ function diacriticFree($text) {
 }
 
 function isError($type) {
-    /*
-     * Error types:
-     *  0 - Tip
-     *  1 - Warning
-     *  2 - Fatal Error
-     *  3 - Warning: More info
-     */
     global $isError;
 
     if ($isError[$type] == TRUE)
@@ -128,25 +121,24 @@ function doError($text, $type) {
 
     switch ($type) {
         case 0:
-            $errorOutput[$type] .= "<li><span class=\"tip\">" . ERROR_TIP . " </span>" . $text . "</li>";
+            $temp = ERROR_TIP;
             break;
-
         case 1:
-            $errorOutput[$type] .= "<li><span class=\"error warning\">" . ERROR_WARNING . " </span>" . $text . "</li>";
+            $temp = ERROR_WARNING;
             break;
-
         case 2:
-            $errorOutput[$type] .= "<li><span class=\"error fatal\">" . ERROR_FATAL . " </span>" . $text . "</li>";
+            $temp = ERROR_FATAL;
             break;
-
         case 3:
-            $errorOutput[$type] .= "<li>" . $text . "</li>";
+            $temp = ERROR_MORE_ERROR_NEAR;
             break;
-
+        
         default:
             die("Unhandled exception #1A." . ERROR_UNHANDLED);
             break;
     }
+    
+    $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text . "</li>";
     $isError[$type] = TRUE;
 }
 
@@ -208,7 +200,7 @@ function morseCode($input, $encode) {
             //spaces need to have two slashes, make them without spaces - str_replace hack else return character in morseCode
             if (!array_key_exists($temp, $morse)) {
                 doError(ERROR_MORSE_T2M_INPUT, 1);
-                doError("<span class=\"error\">" . ERROR_MORE_ERROR_NEAR . "</span>" . ($i + 1) . ". písmeno (Neznámý znak <span class=\"red\">" . $temp . "</span>)", 3);
+                doError(($i + 1) . ". písmeno (Neznámý znak <span class=\"red\">" . $temp . "</span>)", 3);
                 doError(ERROR_MORSE_TIP_LIST, 0);
                 $return .= "<span class=\"red error\" title = '" . ERROR_MORE_ERROR_NEAR . ($i + 1) . ". písmeno (Neznámý znak: " . $temp . ")'>*</span> / ";
             } elseif ($temp == " ") {
@@ -308,6 +300,7 @@ function showOutput($input, $type) {
     if ($input == NULL)
         doError(ERROR_INPUT_EMPTY, 2);
 
+    //Don't bother doing anything if already fatal error
     if (isError(2) == TRUE)
         return;
 
