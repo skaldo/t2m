@@ -34,6 +34,7 @@ $errorOutput = array(
     0 => "", // Tip
     1 => "", // Warn
     2 => "", // Fatal
+    3 => "", // MoreInfo
 );
 
 //DEFINE ERRORS
@@ -43,10 +44,10 @@ define("ERROR_TIP", "Tip:", TRUE);
 define("ERROR_MORE_ERROR_NEAR", "Chyba je poblíž: ", TRUE);
 define("ERROR_INPUT_SIZE_EXCEEDED", "Překročili jste maximální velikost vstupu ", TRUE);
 define("ERROR_INPUT_EMPTY", "Nezapomněli jste na něco?", TRUE);
-define("ERROR_UNHANDLED", "Please remember what you were doint and contact administrator<br />To continue reload page or press F5.", TRUE);
+define("ERROR_UNHANDLED", "Please remember what you were doing and contact administrator<br />To continue reload page or press F5.", TRUE);
 
-define("ERROR_MORSE_T2M_INPUT", "Vstup je pro morseovu abecedu neplatný. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
-define("ERROR_MORSE_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno. <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>", TRUE);
+define("ERROR_MORSE_T2M_INPUT", "Vstup je pro morseovu abecedu neplatný.", TRUE);
+define("ERROR_MORSE_M2T_UNRECOGNIZED", "Zadali jste alespoň jedno neplatné písmeno.", TRUE);
 define("ERROR_MORSE_TIP_LIST", "Máte problémy s Morseovou abecedou? Podívejte se na <a href=\"help.php?type=mo\" onclick=\"return popup('help.php?type=mo')\">seznam znaků</a>!</span>", TRUE);
 
 define("ERROR_BINARY_UNRECOGNIZED", "Neplatný vstup.", TRUE);
@@ -61,15 +62,15 @@ function validateConfig() {
             (!array_key_exists('input_length', $config)) ||
             (!array_key_exists('handle_ch', $config))
     ) {
-        doError(2, 'Config broken. Shutting down. #1');
+        doError(2, "Config broken. Shutting down. #1");
     }
 
     if (!is_bool($config['handle_ch'])) {
-        doError(2, 'Config broken. Shutting down. #2');
+        doError(2, "Config broken. Shutting down. #2");
     }
 
     if (!is_int($config['input_length'])) {
-        doError(2, 'Config broken. Shutting down. #3');
+        doError(2, "Config broken. Shutting down. #3");
     }
 }
 
@@ -136,12 +137,18 @@ function doError($type, $text, $more=NULL) {
     }
 
 
-    $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text . "</li>";
-    $isError[$type] = TRUE;
+        $isError[$type] = TRUE;
 
     if ($more != NULL) {
+        $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text;
+        $errorOutput[$type] .= " <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>";
+        $errorOutput[$type] .= "</li>";
+        
         $errorOutput[3] = "<li><span class=\"bold\">" . ERROR_MORE_ERROR_NEAR . " </span>" . $more . "</li>";
         $isError[3] = TRUE;
+    }
+    else {
+        $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text . "</li>";
     }
 }
 
@@ -214,12 +221,13 @@ function morseCode($input, $encode) {
         }
     } elseif ($encode == FALSE) {
         //MORSECODE DECODE, input check is handled in showOutput()
-        if (strpos($input, "/") === FALSE)
-            $input = explode(" ", $input);            // split by space
-        else {
-            $input = str_replace(" ", "", $input);    //get rid of all spaces
-            $input = explode("/", $input);            //and split by /
-        }
+//        if (strpos($input, "/") === FALSE)
+//            $input = explode(" ", $input);            // split by space
+//     else {
+        $input = str_replace(" ", "", $input);    //get rid of all spaces
+        $input = str_replace(" ", "", $input);    //get rid of all spaces
+        $input = explode("/", $input);            //and split by /
+//        }
 
         foreach ($input as $temp) {
             if ((!in_array($temp, $morse))) {
@@ -262,15 +270,13 @@ function binaryCode($input, $encode) {
         }
     } elseif ($encode == FALSE) {
         //Binary DECODE, input check is handled in showOutput()
-        // split by space or by 8 chars
-        if (preg_match("/\\s/", $input))
-            $input = explode(" ", $input);
-        else {
-            $temp = $input;
-            $input = array();
-            for ($j = 0; $j < strlen($temp); $j += 8)
-                $input[] = substr($temp, $j, 8);
-        }
+        //delete spaces and explode every 8 chars
+        $input = str_replace(" ", "", $input);
+        $temp = $input;
+        $input = array();
+        for ($j = 0; $j < strlen($temp); $j += 8)
+            $input[] = substr($temp, $j, 8);
+        //}
 
         foreach ($input as $temp) {
             if ((!in_array($temp, $binary))) {
@@ -284,7 +290,7 @@ function binaryCode($input, $encode) {
             $i++;
         }
     } else {
-        die("Unhandled"); //TODO: Unhandled
+        die("Unhandled #bin"); //TODO: Unhandled
     }
 
     return $return;
