@@ -1,6 +1,7 @@
-﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <?php
 require_once "config.php";
+
 if (($config['show_gen_time']) == TRUE) {
     $mtime = microtime();
     $mtime = explode(" ", $mtime);
@@ -28,6 +29,13 @@ if (($config['show_gen_time']) == TRUE) {
  */
 
 require_once "include.php";
+
+// Load everything we want to output into $output
+validateConfig();
+if ((isset($_POST['input'])) && (isError(2) != TRUE))
+    $output['text'] = showOutput($_POST['input'], $_POST['type']);
+$output['errors'] = showError();
+
 ?>
 
 <html>
@@ -66,7 +74,7 @@ require_once "include.php";
                         } else {
                             $selected = array("mo" => " selected", "bi" => "");
                         }
-                        
+
                         echo "<option value=\"mo\"" . $selected['mo'] . ">Text2Morse</option>";
                         echo "<option value=\"bi\"" . $selected['bi'] . ">Text2Binary</option>";
                         ?>
@@ -106,15 +114,9 @@ require_once "include.php";
 
             <div id="right">
                 <?php
-                if ((isset($_POST['input'])) && (isset($_POST['type']))) {
-                    $output = showOutput($_POST['input'], $_POST['type']);
-
-                    echo showError();
-
-                    if (isError(2) != TRUE) {
-                        echo $output;
-                    }
-                }
+                echo $output['errors'];
+                if (isset($output['text']))
+                    echo $output['text'];
                 ?>
             </div>
 
