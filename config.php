@@ -1,8 +1,9 @@
 <?php
+
 /*
- * ***********
- * * Config **
- * ***********
+ * **********
+ * * Config *
+ * **********
  * input_length:    - max length of input string. If empty, post_max_size in php.ini is used. In bytes.
  *                  - 524288 recommended - 500K
  *                  - no quotes.

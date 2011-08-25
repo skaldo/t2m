@@ -57,23 +57,18 @@ require_once "include.php";
                         <?php
                         if (isset($_POST['type'])) {
                             switch ($_POST['type']) {
-                                case "mo":
-                                    echo "<option value=\"mo\" selected>Text2Morse</option>";
-                                    echo "<option value=\"bi\">Text2Binary</option>";
-                                    break;
-
                                 case "bi":
-                                    echo "<option value=\"mo\">Text2Morse</option>";
-                                    echo "<option value=\"bi\" selected>Text2Binary</option>";
+                                    $selected['bi'] = " selected";
                                     break;
-
                                 default:
                                     break;
                             }
                         } else {
-                            echo "<option value=\"mo\">Text2Morse</option>";
-                            echo "<option value=\"bi\">Text2Binary</option>";
+                            $selected = array("mo" => " selected", "bi" => "");
                         }
+                        
+                        echo "<option value=\"mo\"" . $selected['mo'] . ">Text2Morse</option>";
+                        echo "<option value=\"bi\"" . $selected['bi'] . ">Text2Binary</option>";
                         ?>
                     </select>
 

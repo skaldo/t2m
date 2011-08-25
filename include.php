@@ -172,8 +172,11 @@ function morseCode($input, $encode) {
         $input = strtolower($input);
         $input = preg_replace('!\s+!', ' ', $input); //multiple spaces into one space
 
-        $getCh = strpos($input, "ch");  //do this before the string is splitted
+        if ($config['handle_ch'] == TRUE)
+            $getCh = strpos($input, "ch");  //do this before the string is splitted
+
         $input = str_split($input);
+
         //handling Ch character, skip if ch not found
         if (($getCh !== FALSE) && ($config['handle_ch'] == TRUE)) {
             for ($j = 0; $j < count($input) - 1; $j++) {
@@ -195,12 +198,12 @@ function morseCode($input, $encode) {
                 $return .= "<span class=\"red bold\" title = '" . ERROR_MORE_ERROR_NEAR . ($i + 1) . ". písmeno (Neznámý znak: " . $temp . ")'>*</span> / ";
             } elseif ($temp == " ") {
                 $return .= "/ ";
-                $return = str_replace("/ /", "//", $return); //formatting, easier than if next char is space do this....
             } else {
                 $return.= $morse[$temp] . " / ";
             }
             $i++;
         }
+        $return = str_replace("/ /", "//", $return); //formatting, easier than if next char is space do this....
     } elseif ($encode == FALSE) {
         //MORSECODE DECODE, input check is handled in showOutput()
         if (strpos($input, "/") === FALSE)
@@ -257,7 +260,6 @@ function binaryCode($input, $encode) {
         $input = array();
         for ($j = 0; $j < strlen($temp); $j += 8)
             $input[] = substr($temp, $j, 8);
-        //}
 
         foreach ($input as $temp) {
             if ((!in_array($temp, $binary))) {
@@ -268,7 +270,6 @@ function binaryCode($input, $encode) {
             } else {
                 $return.= array_search($temp, $binary);
             }
-            $i++;
         }
     } else {
         die("Unhandled #bin"); //TODO: Unhandled
