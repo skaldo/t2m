@@ -29,13 +29,13 @@ if (($config['show_gen_time']) == TRUE) {
 
 require_once "include.php";
 
+checkEverything();
+doError(2, "čau");
+doError(2, "čau", "ore");
 // Load everything we want to output into $output
-validateConfig();
-
 if ((isset($_POST['input'])) && (isError(2) != TRUE))
     $output['text'] = showOutput($_POST['input'], $_POST['type']);
 $output['errors'] = showError();
-
 ?>
 
 <html>

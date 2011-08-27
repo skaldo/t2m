@@ -32,7 +32,9 @@ define("ERROR_MORSE_TIP_LIST", "Máte problémy s Morseovou abecedou? Podívejte
 define("ERROR_BINARY_UNRECOGNIZED", "Neplatný vstup.", TRUE);
 define("ERROR_BINARY_TIP_LIST", "Máte problémy se vstupem? Podívejte se na <a href=\"help.php?type=bi\" onclick=\"return popup('help.php?type=bi')\">seznam znaků</a>!</span>", TRUE);
 
-function validateConfig() {
+function checkEverything() {
+
+    //Check Config
     global $config;
 
     if (
@@ -41,19 +43,31 @@ function validateConfig() {
             (!array_key_exists('input_length', $config)) ||
             (!array_key_exists('handle_ch', $config))
     ) {
-        doError(2, "Config broken. Shutting down. #1");
+        doError(2, "Config broken. Shutting down.", "Config does not exist?");
     }
 
     if (!is_bool($config['handle_ch'])) {
-        doError(2, "Config broken. Shutting down. #2");
+        doError(2, "Config broken. Shutting down.", "Bad input for 'handle_ch' option.");
     }
 
     if (!is_int($config['input_length'])) {
-        doError(2, "Config broken. Shutting down. #3");
+        doError(2, "Config broken. Shutting down.", "Bad input for 'input_length' option.");
     }
 
     if (!is_bool($config['show_gen_time'])) {
-        doError(2, "Config broken. Shutting down. #3");
+        doError(2, "Config broken. Shutting down.", "Bad input for 'show_gen_time' option.");
+    }
+
+    //Check inputs
+    if (isset($_POST['type'])) {
+        switch ($_POST['type']) {
+            case "mo":
+            case "bi":
+                break;
+            default:
+                doError(2, "Invalid conversion type. Are you injecting via POST?");
+                break;
+        }
     }
 }
 
@@ -98,9 +112,15 @@ function doError($type, $text, $more=NULL) {
     global $isError;
     global $errorOutput;
 
-    //Don't make two same errors
+    //If we already have same $text, dont show, but if $more differs, show only $more. else return;
     if ((isError($type) == TRUE) && (strpos($errorOutput[$type], $text) !== FALSE)) {
-        return;
+        if (strpos($errorOutput[3], $more) === FALSE) {
+            $errorOutput[3] .= "<li><span class=\"bold\">" . ERROR_MORE_ERROR_NEAR . "</span>" . $more . "</li>";
+            $isError[3] = TRUE;
+            return;
+        }
+        else
+            return;
     }
 
     switch ($type) {
@@ -127,7 +147,7 @@ function doError($type, $text, $more=NULL) {
         $errorOutput[$type] .= " <a class = \"\" href='#' onclick =\"changeVisibility('moreinfo')\">Více info</a>";
         $errorOutput[$type] .= "</li>";
 
-        $errorOutput[3] = "<li><span class=\"bold\">" . ERROR_MORE_ERROR_NEAR . " </span>" . $more . "</li>";
+        $errorOutput[3] .= "<li><span class=\"bold\">" . ERROR_MORE_ERROR_NEAR . "</span>" . $more . "</li>";
         $isError[3] = TRUE;
     } else {
         $errorOutput[$type] .= "<li><span class=\"bold\">" . $temp . " </span>" . $text . "</li>";
@@ -224,7 +244,7 @@ function morseCode($input, $encode) {
             $i++;
         }
     } else {
-            die("Unhandled exception #MorseCode-1." . ERROR_UNHANDLED);
+        die("Unhandled exception #MorseCode-1." . ERROR_UNHANDLED);
     }
 
     return $return;
@@ -282,7 +302,7 @@ function showOutput($input, $type) {
     $return = NULL;
     global $config;
 
-    validateConfig();
+    checkEverything();
     checkInputLength($input);
 
     if ($input == NULL)
