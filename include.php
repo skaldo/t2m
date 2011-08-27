@@ -115,7 +115,7 @@ function doError($type, $text, $more=NULL) {
             break;
 
         default:
-            die("Unhandled exception #1A." . ERROR_UNHANDLED);
+            die("Unhandled exception #doError-1." . ERROR_UNHANDLED);
             break;
     }
 
@@ -224,7 +224,7 @@ function morseCode($input, $encode) {
             $i++;
         }
     } else {
-        die("unahdled"); //TODO: UNHANDLED
+            die("Unhandled exception #MorseCode-1." . ERROR_UNHANDLED);
     }
 
     return $return;
@@ -272,7 +272,7 @@ function binaryCode($input, $encode) {
             }
         }
     } else {
-        die("Unhandled #bin"); //TODO: Unhandled
+        die("Unhandled #binaryCode-1" . ERROR_UNHANDLED);
     }
 
     return $return;
@@ -320,7 +320,7 @@ function showOutput($input, $type) {
             break;
 
         default:
-            die("Unhandled"); //TODO: UNHANDLED
+            die("Unhandled exception #showOutput-1." . ERROR_UNHANDLED);
             break;
     }
     return $return;

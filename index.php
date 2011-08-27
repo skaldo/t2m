@@ -18,7 +18,6 @@ if (($config['show_gen_time']) == TRUE) {
  * H: Locales - make everything into defines or something like this. Now we have some of them in defs, others are hardcoded
  * 
  * M: Better UI
- * M: Unhandled errors.
  * M: Copy to clipboard
  * 
  * F: sentence divider?
@@ -32,6 +31,7 @@ require_once "include.php";
 
 // Load everything we want to output into $output
 validateConfig();
+
 if ((isset($_POST['input'])) && (isError(2) != TRUE))
     $output['text'] = showOutput($_POST['input'], $_POST['type']);
 $output['errors'] = showError();
