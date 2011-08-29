@@ -30,8 +30,6 @@ if (($config['show_gen_time']) == TRUE) {
 require_once "include.php";
 
 checkEverything();
-doError(2, "čau");
-doError(2, "čau", "ore");
 // Load everything we want to output into $output
 if ((isset($_POST['input'])) && (isError(2) != TRUE))
     $output['text'] = showOutput($_POST['input'], $_POST['type']);
@@ -62,22 +60,8 @@ $output['errors'] = showError();
             <div id="left">
                 <form action="index.php" method="POST">
                     <select name="type">
-                        <?php
-                        if (isset($_POST['type'])) {
-                            switch ($_POST['type']) {
-                                case "bi":
-                                    $selected['bi'] = " selected";
-                                    break;
-                                default:
-                                    break;
-                            }
-                        } else {
-                            $selected = array("mo" => " selected", "bi" => "");
-                        }
-
-                        echo "<option value=\"mo\"" . $selected['mo'] . ">Text2Morse</option>";
-                        echo "<option value=\"bi\"" . $selected['bi'] . ">Text2Binary</option>";
-                        ?>
+                        <option value="mo"<?php if ((isset($_POST['type']))&&($_POST['type']=="mo")) echo " selected"; ?>>Text2Morse</option>
+                        <option value="bi"<?php if ((isset($_POST['type']))&&($_POST['type']=="bi")) echo " selected"; ?>>Text2Binary</option>
                     </select>
 
                     <textarea rows="6" cols="40" name="input"><?php if (isset($_POST['input']))

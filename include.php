@@ -60,14 +60,8 @@ function checkEverything() {
 
     //Check inputs
     if (isset($_POST['type'])) {
-        switch ($_POST['type']) {
-            case "mo":
-            case "bi":
-                break;
-            default:
-                doError(2, "Invalid conversion type. Are you injecting via POST?");
-                break;
-        }
+        if (($_POST['type'] != "mo") && ($_POST['type'] != "bi"))
+            doError(2, "Invalid conversion type. Are you injecting via POST?");
     }
 }
 
@@ -227,10 +221,10 @@ function morseCode($input, $encode) {
     } elseif ($encode == FALSE) {
         //MORSECODE DECODE, input check is handled in showOutput()
         if (strpos($input, "/") === FALSE)
-            $input = explode(" ", $input);            // split by space
+            $input = explode(" ", $input);            // explode by space
         else {
             $input = str_replace(" ", "", $input);    //get rid of all spaces
-            $input = explode("/", $input);            //and split by /
+            $input = explode("/", $input);            //and explode by /
         }
 
         foreach ($input as $temp) {
@@ -276,10 +270,10 @@ function binaryCode($input, $encode) {
         //Binary DECODE, input check is handled in showOutput()
         //delete spaces and explode every 8 chars
         $input = str_replace(" ", "", $input);
-        $temp = $input;
+        $input2 = $input;
         $input = array();
-        for ($j = 0; $j < strlen($temp); $j += 8)
-            $input[] = substr($temp, $j, 8);
+        for ($j = 0; $j < strlen($input2); $j += 8)
+            $input[] = substr($input2, $j, 8);
 
         foreach ($input as $temp) {
             if ((!in_array($temp, $binary))) {
